@@ -930,7 +930,7 @@ dnl Extra warnings
 dnl
 AC_DEFUN(AC_ENABLE_WARNINGS, [
 AC_ARG_ENABLE(warnings,
-[--enable-warnings		Generate extra warnings (default=no)],
+[--enable-warnings		Generate extra warnings (default=yes)],
 [ if test x"${enable_warnings}" = xyes
   then
     enable_warnings=1
@@ -938,7 +938,7 @@ AC_ARG_ENABLE(warnings,
     enable_warnings=0
   fi
 ],
-[ enable_warnings=0 ])
+[ enable_warnings=1 ])
 AC_DEFINE_UNQUOTED(ENABLE_WARNINGS, ${enable_warnings},
                    [Generate extra warnings. ])
 AC_SUBST(enable_warnings)])

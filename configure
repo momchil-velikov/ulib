@@ -858,7 +858,7 @@ Optional Features:
 --enable-debug			Include debug info (default=yes)
 --enable-optimize		Build with optimization (default=no)
 --enable-optimize-space		Favor smaller code and data size (default=no)
---enable-warnings		Generate extra warnings (default=no)
+--enable-warnings		Generate extra warnings (default=yes)
 --enable-host-cpu=CPU		Build with optimizations for CPU
 
 Some influential environment variables:
@@ -3320,7 +3320,7 @@ if test "${enable_warnings+set}" = set; then
   fi
 
 else
-   enable_warnings=0
+   enable_warnings=1
 fi;
 
 cat >>confdefs.h <<_ACEOF
