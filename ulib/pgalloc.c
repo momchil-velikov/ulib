@@ -4,8 +4,8 @@
 #include "unwind.h"
 #include <ulib/config.h>
 
-#if HAVE_STDINT_H
-#include <stdint.h>
+#if HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 
 #if !HAVE_UINTPTR_T

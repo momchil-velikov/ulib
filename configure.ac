@@ -15,7 +15,7 @@ AC_STANDARD_CHECKS
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h stddef.h stdint.h stdlib.h string.h wchar.h])
+AC_CHECK_HEADERS([limits.h stddef.h inttypes.h stdlib.h string.h wchar.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
@@ -26,7 +26,7 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset])
 
-# Autoheader stuff.  
+# Autoheader stuff.
 AH_TOP([
 #ifndef ulib__config_h
 #define ulib__config_h])

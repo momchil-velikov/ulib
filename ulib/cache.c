@@ -6,8 +6,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-#if HAVE_STDINT_H
-#include <stdint.h>
+#if HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 
 #if !HAVE_UINTPTR_T
