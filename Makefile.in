@@ -1,0 +1,14 @@
+top_builddir = .
+top_srcdir   = @top_srcdir@
+srcdir       = @srcdir@
+
+include $(top_builddir)/config.mk
+
+subdirs = ulib test
+
+include $(top_srcdir)/config/host-rules.mk
+
+distclean::
+	$(RM) config.log config.status config.mk autom4te.cache
+
+.NOTPARALLEL:

@@ -1,0 +1,20 @@
+top_builddir = @abs_top_builddir@
+top_srcdir   = @top_srcdir@
+srcdir       = @srcdir@
+
+include $(top_builddir)/config.mk
+
+TESTS = test-pgalloc test-cache test-splay-tree test-splay-tree-gc	\
+        test-object
+
+OBJS  = $(TESTS:%=%.o)
+DEPS  = $(OBJS:%.o=%.d)
+
+include $(top_srcdir)/config/host-rules.mk
+
+all:: $(TESTS)
+
+$(TESTS) : %: %.o ../ulib/libulib.a
+	$(CC) $(LDFLAGS) -o $@ $< -L../ulib -lulib
+clean::
+	$(RM) $(TESTS)
