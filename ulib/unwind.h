@@ -97,7 +97,7 @@ struct ulib__unwind_rec_cleanup
 struct ulib__unwind_rec_catch
 {
   struct ulib__unwind_rec_base base;
-  jmp_buf jmpbuf;
+  jmp_buf jbuf;
   unsigned int type;
   ulib_throw_arg arg;
 };
@@ -145,7 +145,7 @@ void ulib__unwind_cleanup_add (struct ulib__unwind_rec_cleanup *,
     ulib__unwind_rec_catch_buffer.base.prev				\
        = ulib__current_unwind_record;					\
     ulib__current_unwind_record = &ulib__unwind_rec_catch_buffer.base;	\
-    if (setjmp (ulib__unwind_rec_catch_buffer.jmpbuf) == 0)
+    if (setjmp (ulib__unwind_rec_catch_buffer.jbuf) == 0)
 
 /* Begin a catch block.  */
 #define ulib_unwind_catch(type, arg)				\

@@ -101,7 +101,7 @@ ulib__unwind_throw (int type, const ulib_throw_arg *arg)
   rc = (struct ulib__unwind_rec_catch *) rb;
   rc->type = type;
   rc->arg = *arg;
-  longjmp (rc->jmpbuf, 1);
+  longjmp (rc->jbuf, 1);
 }
 
 /* Default unhandled exception function.  */
