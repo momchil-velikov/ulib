@@ -130,6 +130,7 @@ ULIB_AVL_TREE (balance_right) (ULIB_AVL_TREE_TYPE **pr)
       r->balance = 1;
       return 0;
 
+    default:
     case 1:
       t = r->right;
       if (t->balance >= 0)
@@ -196,6 +197,7 @@ ULIB_AVL_TREE (balance_left) (ULIB_AVL_TREE_TYPE **pr)
       r->balance = -1;
       return 0;
 
+    default:
     case -1:
       t = r->left;
       if (t->balance <= 0)
