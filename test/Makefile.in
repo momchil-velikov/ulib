@@ -4,7 +4,8 @@ srcdir       = @srcdir@
 
 include $(top_builddir)/config.mk
 
-TESTS = test-pgalloc test-cache test-splay-tree test-splay-tree-gc
+TESTS = test-pgalloc test-cache test-splay-tree test-splay-tree-gc	\
+        test-avl-tree
 
 OBJS  = $(TESTS:%=%.o)
 DEPS  = $(OBJS:%.o=%.d)

@@ -1,10 +1,10 @@
 #include <ulib/cache.h>
 
-#define ULIB_SPLAY_TREE_KEY_TYPE unsigned int
-#define ULIB_SPLAY_TREE_TYPE uint_tree
+#define ULIB_AVL_TREE_KEY_TYPE unsigned int
+#define ULIB_AVL_TREE_TYPE uint_tree
 
-#include <ulib/splay-tree.h>
-#include <ulib/splay-tree.c>
+#include <ulib/avl-tree.h>
+#include <ulib/avl-tree.c>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,14 +13,6 @@
 #include <sys/time.h>
 
 ulib_cache *uint_tree_cache;
-
-static void
-uint_tree_ctor (void *_obj, unsigned int size __attribute__ ((unused)))
-{
-  uint_tree *obj = (uint_tree *) _obj;
-
-  obj->left = obj->right = 0;
-}
 
 #define NLOOPS 10000000
 #define NKEYS 1000
@@ -67,6 +59,30 @@ check_tree (uint_tree *node)
     {
       check_greater_than (node->right, node->key);
       check_tree (node->right);
+    }
+}
+
+static void
+dump_tree (uint_tree *t, int level)
+{
+  int i;
+
+  if (level == 0)
+    printf ("\n");
+
+  for (i = 0; i < level; i++)
+    printf ("    ");
+
+  if (!t)
+    printf ("<null>\n");
+  else
+    {
+      printf ("key: %u, bal: %d\n", t->key, t->balance);
+      if (t->left || t->right)
+	{
+	  dump_tree (t->left, level + 1);
+	  dump_tree (t->right, level + 1);
+	}
     }
 }
 
@@ -129,7 +145,6 @@ main ()
   uint_tree_cache =
     ulib_cache_create (ULIB_CACHE_SIZE, sizeof (uint_tree),
 		       ULIB_CACHE_ALIGN, sizeof (void *),
-		       ULIB_CACHE_CTOR, uint_tree_ctor,
 		       0);
   gettimeofday (&tv1, 0);
   test ();
@@ -152,6 +167,6 @@ main ()
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: b7280c6e-5f15-4b54-8e7f-022b2f4c95f5
+ * arch-tag: 5253f3b0-3d49-4014-84c0-eab9edbb265d
  * End:
  */
