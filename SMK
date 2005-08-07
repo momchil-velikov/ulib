@@ -1,0 +1,8 @@
+smk.env.cc.include ([smk.env.top_srcdir])
+smk.subdirs (['ulib', 'test'])
+
+# Local variables:
+# mode: python
+# indent-tabs-mode: nil
+# arch-tag: fa14ec4a-1233-4ecc-8725-163938179c83
+# End:

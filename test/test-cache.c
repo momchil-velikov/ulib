@@ -8,8 +8,8 @@
 #define NPTR 5000
 #define NCACHE 20
 
-void *ptr[NCACHE][NPTR];
-ulib_cache *cache[NCACHE];
+static void *ptr[NCACHE][NPTR];
+static ulib_cache *cache[NCACHE];
 
 int
 main ()

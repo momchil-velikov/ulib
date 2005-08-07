@@ -4,7 +4,7 @@ srcdir       = @srcdir@
 
 include $(top_builddir)/config.mk
 
-SRCS = unwind.c alloc.c hash.c vector.c utf8.c pgalloc.c cache.c
+SRCS = hash.c vector.c utf8.c pgalloc.c cache.c
 DEPS = $(SRCS:%.c=%.d)
 OBJS = $(SRCS:%.c=%.o)
 

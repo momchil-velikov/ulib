@@ -1,8 +1,8 @@
 #include "pgalloc.h"
 #include "list.h"
-#include "alloc.h"
-#include "unwind.h"
-#include <ulib/config.h>
+#include "config.h"
+
+#include <stdlib.h>
 
 #if HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -159,40 +159,38 @@ ulib_pgalloc ()
     }
 
   /* Allocate a new page group.  */
-  ulib_unwind_frame_begin;
-
-  ptr = ulib_malloc ((NPAGES + 1) * G.pgsize);
-  ulib_unwind_cleanup_add (ulib_free, ptr);
-
-  node = ulib_malloc (sizeof (struct pgroup_tree));
-  ulib_unwind_cleanup_discard ();
-
-  ulib_unwind_frame_end;
-
-  node->left = node->right = 0;
-  node->key = ptr;
-
-  /* Check if the malloc returned a suitably aligned page.  It is
-     quite likely such a big allocations resulted in a pointer aligned
-     on the system's page size boundary and our page size is usually
-     smaller.  If this is the case, we have one bonus page, besides
-     the usual NPAGES.  */
-  if (((uintptr_t) ptr & (G.pgsize - 1)) == 0)
+  if ((ptr = malloc ((NPAGES + 1) * G.pgsize)) != 0)
     {
-      node->data.page = ptr;
-      node->data.map = BONUS_ALLOC_MASK | ALLOC_MASK;
-    }
-  else
-    {
-      node->data.page =
-	(void *) (((uintptr_t) ptr + G.pgsize - 1) & -G.pgsize);
-      node->data.map = ALLOC_MASK;
-    }
+      if ((node = malloc (sizeof (struct pgroup_tree))) != 0)
+        {
+          node->left = node->right = 0;
+          node->key = ptr;
 
-  ulib_list_insert (&G.groups, &node->data.list);
-  pgroup_tree_insert (&G.root, node);
-
-  return pgalloc (&node->data);
+          /* Check if the malloc returned a suitably aligned page.  It
+             is quite likely such a big allocations resulted in a
+             pointer aligned on the system's page size boundary and
+             our page size is usually smaller.  If this is the case,
+             we have one bonus page, besides the usual NPAGES.  */
+          if (((uintptr_t) ptr & (G.pgsize - 1)) == 0)
+            {
+              node->data.page = ptr;
+              node->data.map = BONUS_ALLOC_MASK | ALLOC_MASK;
+            }
+          else
+            {
+              node->data.page =
+                (void *) (((uintptr_t) ptr + G.pgsize - 1) & -G.pgsize);
+              node->data.map = ALLOC_MASK;
+            }
+          
+          ulib_list_insert (&G.groups, &node->data.list);
+          pgroup_tree_insert (&G.root, node);
+          
+          return pgalloc (&node->data);
+        }
+      free (ptr);
+    }
+  return 0;
 }
 
 /* Mark as available from GRP the page at PTR.  */
@@ -236,8 +234,8 @@ ulib_pgfree (void *ptr)
       if (G.free == &grp->data)
 	G.free = (struct pgroup *) grp->data.list.next;
       ulib_list_remove (&grp->data.list);
-      ulib_free (grp->key);
-      ulib_free (grp);
+      free (grp->key);
+      free (grp);
     }
   /* Insert the page group at the head of the free list, if it was
      empty.  */

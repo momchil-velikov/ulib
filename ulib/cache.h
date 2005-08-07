@@ -53,10 +53,10 @@ void ulib_cache_free (ulib_cache *, void *);
 void ulib_cache_flush (ulib_cache *);
 
 /* Register a non-cached root object.  */
-void ulib_gcroot (void *, ulib_gcscan_func);
+int ulib_gcroot (void *, ulib_gcscan_func);
 
 /* Register a cached root object.  */
-void ulib_gcroot_cached (void *);
+int ulib_gcroot_cached (void *);
 
 /* Unregister a root object.  */
 void ulib_gcunroot (void *);

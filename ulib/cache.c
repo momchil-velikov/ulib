@@ -1,10 +1,12 @@
 #include "cache.h"
 #include "pgalloc.h"
-#include "unwind.h"
 #include "assert.h"
-#include "alloc.h"
 #include <string.h>
+#include <stdlib.h>
 #include <stdarg.h>
+#include <errno.h>
+
+#include "config.h"
 
 #if HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -42,12 +44,12 @@ struct slab
 };
 
 /* Object state constants.  */
-#define GCFLAG     0x8000
-#define ALLOCATED  0x4000
-#define FRAME_MASK 0x1fff
+#define GCFLAG     0x8000U
+#define ALLOCATED  0x4000U
+#define FRAME_MASK 0x1fffU
 
 /* End of list tag.  */
-#define SLAB_EOL (0xffff & ~ALLOCATED)
+#define SLAB_EOL (0xffffU & ~ALLOCATED)
 
 /* Available objects count.  */
 #define SLAB_COUNT(slab) (slab->info & ~GCFLAG)
@@ -280,11 +282,15 @@ ulib_cache_create (int attr, ...)
       switch (attr)
 	{
 	case ULIB_CACHE_SIZE:
-	  size = va_arg (ap, unsigned int);
+	  size = va_arg (ap, unsigned int); 
+          if (size > ULIB_CACHE_OBJECT_SIZE_MAX)
+            goto einval;
 	  break;
 
 	case ULIB_CACHE_ALIGN:
 	  align = va_arg (ap, unsigned int);
+          if (align > ULIB_CACHE_OBJECT_ALIGN_MAX)
+            goto einval;
 	  break;
 
 	case ULIB_CACHE_CTOR:
@@ -311,9 +317,7 @@ ulib_cache_create (int attr, ...)
 	  break;
 
 	default:
-	  ulib_unwind_throw_ptr (ULIB_INVALID_PARAMETER,
-				 "Invalid cache attribute");
-	  return 0;
+          goto einval;
 	}
       attr = va_arg (ap, unsigned int);
     }
@@ -329,15 +333,15 @@ ulib_cache_create (int attr, ...)
   if (align < ULIB_CACHE_OBJECT_ALIGN_MIN)
     size = ULIB_CACHE_OBJECT_ALIGN_MIN;
 
-  if (size > ULIB_CACHE_OBJECT_SIZE_MAX
-      || align > ULIB_CACHE_OBJECT_ALIGN_MAX)
-    ulib_unwind_throw_ptr (ULIB_INVALID_PARAMETER,
-			   "Invalid cache attribute value");
+  if ((cache = ulib_cache_alloc (&G.cache_cache)) == 0)
+    return 0;
 
-  cache = ulib_cache_alloc (&G.cache_cache);
   cache_init (cache, size, align, ctor, clear, dtor, gc, scan);
-
   return cache;
+
+einval:
+  errno = EINVAL;
+  return 0;
 }
 
 /* Initialize and add a slab to a cache.  */
@@ -402,7 +406,8 @@ ulib_cache_alloc (ulib_cache *cache)
   slab = cache->free;
   if (slab == (struct slab *) &cache->slabs)
     {
-      ptr = (char *) ulib_pgalloc ();
+      if ((ptr = (char *) ulib_pgalloc ()) == 0)
+        return 0;
       slab = slab_init (cache, ptr);
     }
 
@@ -448,7 +453,7 @@ ulib_cache_free (ulib_cache *cache, void *ptr)
 
   /* Clear the object.  */
   slab = object_slab (ptr);
-  ulib_assert (cache == slab->cache);
+  assert (cache == slab->cache);
   if (cache->clear)
     cache->clear (ptr, cache->usize);
 
@@ -526,38 +531,44 @@ gcroot (void *obj)
   if (!cache_initialized)
     init_cache ();
 
-  root = ulib_cache_alloc (&G.root_cache);
+  if ((root = ulib_cache_alloc (&G.root_cache)) == 0)
+    return 0;
   root->key = obj;
 
   if (G.roots)
     ulib_list_insert (&G.roots->data.list, &root->data.list);
 
   root_already_registered = root_tree_insert (&G.roots, root);
-  ulib_assert (root_already_registered == 0);
+  assert (root_already_registered == 0);
 
   return root;
 }
 
 /* Register a non-cached root object.  */
-void
+int
 ulib_gcroot (void *obj, ulib_gcscan_func scan)
 {
   root_tree *root;
 
-  root = gcroot (obj);
+  if ((root = gcroot (obj)) == 0)
+    return -1;
+
   root->data.scan = scan;
   root->data.cached = 0;
+  return 0;
 }
 
 /* Register a cached root object.  */
-void
+int
 ulib_gcroot_cached (void *obj)
 {
   root_tree *root;
 
-  root = gcroot (obj);
+  if ((root = gcroot (obj)) == 0)
+    return -1;
   root->data.scan = object_slab (obj)->cache->scan;
   root->data.cached = 1;
+  return 0;
 }
 
 /* Unregister a root object.  */
@@ -567,7 +578,7 @@ ulib_gcunroot (void *ptr)
   root_tree *root;
 
   root = root_tree_delete (&G.roots, ptr);
-  ulib_assert (root != 0);
+  assert (root != 0);
 
   ulib_list_remove (&root->data);
   ulib_cache_free (&G.root_cache, root);
@@ -586,7 +597,7 @@ struct gc_mark_frame
    array FRM->OBJS.  The parameter FRM->N is the number of elements in
    the array, while the parameter FRM->SZ is the allocated size of the
    array.  Set the new number of elements in FRM->N.  */
-static void
+static int
 gc_scan_obj (ulib_gcscan_func scan, void *obj,
 	     struct gc_mark_frame *frm)
 {
@@ -595,12 +606,19 @@ gc_scan_obj (ulib_gcscan_func scan, void *obj,
   cnt = scan (obj, frm->objs + frm->n, frm->sz - frm->n);
   if (cnt < 0)
     {
+      void **objs;
+
+      objs = realloc (frm->objs, (frm->sz - cnt) * sizeof (void *));
+      if (objs == 0)
+        return -1;
+
       frm->sz -= cnt;
-      frm->objs = ulib_realloc (frm->objs, frm->sz * sizeof (void *));
+      frm->objs = objs;
       cnt = scan (obj, frm->objs + frm->n, frm->sz - frm->n);
-      ulib_assert (cnt > 0);
+      assert (cnt > 0);
     }
   frm->n += cnt;
+  return 0;
 }
 
 /* Perform the mark phase of the collector.  The mark process starts
@@ -610,7 +628,7 @@ gc_scan_obj (ulib_gcscan_func scan, void *obj,
    differs from the current reachability flag.  The array OBJS is used
    in a stack-like fashion to keep track of the objects pending
    scanning.  */
-static void
+static int
 gc_mark ()
 {
   void *obj;
@@ -620,7 +638,7 @@ gc_mark ()
   root_tree *head, *root;
 
   if ((head = G.roots) == 0)
-    return;
+    return 0;
 
   frm.objs = 0;
   frm.sz = 0;
@@ -630,17 +648,21 @@ gc_mark ()
       frm.n = 0;
       /* Scan the root object.  */
       if (root->data.cached == 0)
-	gc_scan_obj (root->data.scan, root->key, &frm);
+        {
+          if (gc_scan_obj (root->data.scan, root->key, &frm) < 0)
+            goto error;
+        }
       else
 	{
 	  slab = object_slab (root->key);
 	  index = object_index (slab, root->key);
-	  ulib_assert (slab->ctl [index] & ALLOCATED);
+          assert (slab->ctl [index] & ALLOCATED);
 
 	  if ((slab->ctl [index] & GCFLAG) != G.gcflag)
 	    {
 	      slab->ctl [index] ^= GCFLAG;
-	      gc_scan_obj (root->data.scan, root->key, &frm);
+	      if (gc_scan_obj (root->data.scan, root->key, &frm) < 0)
+                goto error;
 	    }
 	}
 
@@ -655,8 +677,9 @@ gc_mark ()
 	      && (slab->ctl [index] & GCFLAG) != G.gcflag)
 	    {
 	      slab->ctl [index] ^= GCFLAG;
-	      if (slab->cache->scan)
-		gc_scan_obj (slab->cache->scan, obj, &frm);
+	      if (slab->cache->scan
+                  && gc_scan_obj (slab->cache->scan, obj, &frm) < 0)
+                goto error;
 	    }
 	}
 
@@ -665,7 +688,12 @@ gc_mark ()
     }
   while (root != head);
 
-  ulib_free (frm.objs);
+  free (frm.objs);
+  return 0;
+
+error:
+  free (frm.objs);
+  return -1;
 }
 
 /* Perform the sweep phase of the collector.  Traverse the allocated
@@ -732,8 +760,6 @@ gc_sweep (int merge)
 void
 ulib_gcpush ()
 {
-  if (!cache_initialized)
-    init_cache ();
   G.gcframe++;
 }
 
@@ -743,21 +769,31 @@ void
 ulib_gcpop ()
 {
   if (!cache_initialized)
-    init_cache ();
-  G.gcflag ^= GCFLAG;
-  gc_mark ();
-  gc_sweep (1);
-  G.gcframe--;
+    --G.gcframe;
+  else
+    {
+      G.gcflag ^= GCFLAG;
+      if (gc_mark () < 0)
+        G.gcflag ^= GCFLAG;
+      else
+        {
+          gc_sweep (1);
+          G.gcframe--;
+        }
+    }
 }
 
 /* Perform garbage collection.  */
 void ulib_gcrun ()
 {
-  if (!cache_initialized)
-    init_cache ();
-  G.gcflag ^= GCFLAG;
-  gc_mark ();
-  gc_sweep (0);
+  if (cache_initialized)
+    {
+      G.gcflag ^= GCFLAG;
+      if (gc_mark () < 0)
+        G.gcflag ^= GCFLAG;
+      else
+        gc_sweep (0);
+    }
 }
 
 /*

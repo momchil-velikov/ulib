@@ -2,9 +2,10 @@
 #define ulib__vector_h 1
 
 #include "defs.h"
-#include "alloc.h"
 #include "assert.h"
 #include <string.h>
+#include <stdlib.h>
+#include <assert.h>
 
 BEGIN_DECLS
 
@@ -49,14 +50,15 @@ struct ulib_vector
 };
 typedef struct ulib_vector ulib_vector;
 
-/* Initialize a vector.  Throws ULIB_INVALID_PARAMETER.  */
-void ulib_vector_init (ulib_vector *, ...);
+/* Initialize a vector.  On error sets errno and returns a negative
+   value.  */
+int ulib_vector_init (ulib_vector *, ...);
 
 /* Destroy a vector.  */
 static inline void
 ulib_vector_destroy (ulib_vector *v)
 {
-  ulib_free (v->data);
+  free (v->data);
 }
 
 /* Get number of elements in the vector.  */
@@ -66,9 +68,19 @@ ulib_vector_length (const ulib_vector *v)
   return v->nelt;
 }
 
-/* Preallocate a number of elements in the vector.  Can throw
-   ULIB_NO_MEMORY.  */
-void ulib_vector_reserve (ulib_vector *, unsigned int);
+/* Set the number of elements in the vector.  */
+int ulib_vector_set_size (ulib_vector *, unsigned int);
+
+/* Change the number of elements in the vector by adding signed N to
+   the current size.  */
+static inline int
+ulib_vector_resize (ulib_vector *v, int n)
+{
+  return ulib_vector_set_size (v, v->nelt + n);
+}
+
+/* Preallocate space in the vector.  */
+int ulib_vector_reserve (ulib_vector *, unsigned int);
 
 /* Empty a vector.  */
 static inline void
@@ -77,19 +89,19 @@ ulib_vector_clear (ulib_vector *v, int release)
   v->nelt = 0;
   if (release)
     {
-      ulib_free (v->data);
+      free (v->data);
       v->data = 0;
     }
 }
 
 /* Set a vector element.  */
-void ulib_vector_set (ulib_vector *, unsigned int, const void *);
+int ulib_vector_set (ulib_vector *, unsigned int, const void *);
 
 /* Get a pointer to a vector element.  */
-static inline const void *
+static inline void *
 ulib_vector_elt (const ulib_vector *v, unsigned int idx)
 {
-  ulib_assert (idx < v->nelt);
+  assert (idx < v->nelt);
   return (char *) v->data + idx * v->elt_size;
 }
 
@@ -97,18 +109,18 @@ ulib_vector_elt (const ulib_vector *v, unsigned int idx)
 static inline void *
 ulib_vector_last_elt (const ulib_vector *v)
 {
-  ulib_assert (v->nelt > 0);
+  assert (v->nelt > 0);
   return (char *) v->data + (v->nelt - 1) * v->elt_size;
 }
 
 /* Set a data pointer element.  */
-void ulib_vector_set_ptr (ulib_vector *, unsigned int, void *);
+int ulib_vector_set_ptr (ulib_vector *, unsigned int, void *);
 
 /* Get the value of a data pointer element.  */
 static inline void *
 ulib_vector_ptr_elt (const ulib_vector *v, unsigned int idx)
 {
-  ulib_assert (idx < v->nelt);
+  assert (idx < v->nelt);
   return ((void **) v->data) [idx];
 }
 
@@ -116,18 +128,18 @@ ulib_vector_ptr_elt (const ulib_vector *v, unsigned int idx)
 static inline void *
 ulib_vector_last_ptr_elt (const ulib_vector *v)
 {
-  ulib_assert (v->nelt > 0);
+  assert (v->nelt > 0);
   return ((void **) v->data) [v->nelt - 1];
 }
 
 /* Set a function pointer element.  */
-void ulib_vector_set_func (ulib_vector *, unsigned int, ulib_func);
+int ulib_vector_set_func (ulib_vector *, unsigned int, ulib_func);
 
 /* Get the value of a function pointer element.  */
 static inline ulib_func
 ulib_vector_func_elt (const ulib_vector *v, unsigned int idx)
 {
-  ulib_assert (idx < v->nelt);
+  assert (idx < v->nelt);
   return ((ulib_func *) v->data) [idx];
 }
 
@@ -135,59 +147,65 @@ ulib_vector_func_elt (const ulib_vector *v, unsigned int idx)
 static inline ulib_func
 ulib_vector_last_func_elt (const ulib_vector *v)
 {
-  ulib_assert (v->nelt > 0);
+  assert (v->nelt > 0);
   return ((ulib_func *) v->data) [v->nelt - 1];
 }
 
 /* Append an element to the vector.  */
-static inline void
+static inline int
 ulib_vector_append (ulib_vector *v, const void *data)
 {
-  ulib_vector_set (v, v->nelt, data);
+  return ulib_vector_set (v, v->nelt, data);
 }
 
 /* Append a data pointer to the vector.  */
-static inline void
+static inline int
 ulib_vector_append_ptr (ulib_vector *v, void *data)
 {
-  ulib_vector_set_ptr (v, v->nelt, data);
+  return ulib_vector_set_ptr (v, v->nelt, data);
 }
 
 /* Append a function pointer to the vector.  */
-static inline void
+static inline int
 ulib_vector_append_func (ulib_vector *v, ulib_func func)
 {
-  ulib_vector_set_func (v, v->nelt, func);
+  return ulib_vector_set_func (v, v->nelt, func);
 }
 
 /* private */
-void ulib__vector_moveup (ulib_vector *v, unsigned int idx);
+int ulib__vector_moveup (ulib_vector *v, unsigned int idx);
 
 /* Insert an element into the vector before position IDX.  */
-static inline void
+static inline int
 ulib_vector_insert (ulib_vector *v, unsigned int idx, const void *data)
 {
-  ulib__vector_moveup (v, idx);
+  if (ulib__vector_moveup (v, idx) < 0)
+    return -1;
   memcpy ((char *) v->data + idx * v->elt_size, data, v->elt_size);
   v->nelt++;
+  return 0;
 }
 
 /* Insert a data pointer into the vector before position IDX.  */
-static inline void
+static inline int
 ulib_vector_insert_ptr (ulib_vector *v, unsigned int idx, void *data)
 {
-  ulib__vector_moveup (v, idx);
+  if (ulib__vector_moveup (v, idx) < 0)
+    return -1;
   ((void **) v->data) [idx] = data;
   v->nelt++;
+  return 0;
 }
 
 /* Insert a function pointer into the vector before position IDX.  */
-static inline void
+static inline int
 ulib_vector_insert_func (ulib_vector *v, unsigned int idx, ulib_func func)
 {
-  ulib__vector_moveup (v, idx);
+  if (ulib__vector_moveup (v, idx) < 0)
+    return -1;
   ((ulib_func *) v->data) [idx] = func;
   v->nelt++;
+  return 0;
 }
 
 /* Remove the element at IDX from the vector.  */
@@ -197,7 +215,7 @@ void ulib_vector_remove (ulib_vector *v, unsigned int idx);
 static inline void
 ulib_vector_remove_last (ulib_vector *v)
 {
-  ulib_assert (v->nelt > 0);
+  assert (v->nelt > 0);
   v->nelt--;
 }
 

@@ -1,10 +1,10 @@
 #include "vector.h"
-#include "unwind.h"
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 /* Initialize a vector.  */
-void
+int
 ulib_vector_init (ulib_vector *v, ...)
 {
   va_list ap;
@@ -72,86 +72,120 @@ ulib_vector_init (ulib_vector *v, ...)
     goto einval;
 
   if (v->navail)
-    v->data = ulib_calloc (v->navail, v->elt_size);
-  return;
+    {
+      v->data = calloc (v->navail, v->elt_size);
+      if (v->data == 0)
+        {
+          errno = ENOMEM;
+          return -1;
+        }
+    }
+  return 0;
 
  einval:
-  ulib_unwind_throw_int (ULIB_INVALID_PARAMETER, 0);
+  errno = EINVAL;
+  return -1;
 }
 
 /* Increase the available space.  */
-static void
+static int
 grow (ulib_vector *v, unsigned int req)
 {
   unsigned int n;
+  void *data;
 
   n = v->scale * v->nelt + v->offset;
   if (req > n)
     n = req;
 
-  v->data = ulib_realloc (v->data, n * v->elt_size);
-  memset ((char *) v->data + v->navail * v->elt_size, 0,
-	  (n - v->navail) * v->elt_size);
-  v->navail = n;
+  if ((data = realloc (v->data, n * v->elt_size)) != 0)
+    {
+      v->data = data;
+      memset ((char *) v->data + v->navail * v->elt_size, 0,
+              (n - v->navail) * v->elt_size);
+      v->navail = n;
+
+      return 0;
+    }
+
+  return -1;
+}
+
+/* Set the number of elements in the vector.  */
+int
+ulib_vector_set_size (ulib_vector *v, unsigned int sz)
+{
+  if (sz > v->navail && grow (v, sz) < 0)
+    return -1;
+  
+  v->nelt = sz;
+  return 0;
 }
 
 /* Preallocate a number of elements in the vector.  */
-void
+int
 ulib_vector_reserve (ulib_vector *v, unsigned int req)
 {
   if (req > v->navail)
-    grow (v, req);
+    return grow (v, req);
+  else
+    return 0;
 }
 
 /* Append an element to the vector.  */
-void
+int
 ulib_vector_set (ulib_vector *v, unsigned int idx, const void *data)
 {
-  if (idx >= v->navail)
-    grow (v, idx + 1);
+  if (idx >= v->navail && grow (v, idx + 1) < 0)
+    return -1;
 
   memcpy ((char *) v->data + idx * v->elt_size, data, v->elt_size);
   if (idx >= v->nelt)
     v->nelt = idx + 1;
+  return 0;
 }
 
 /* Set a data pointer element.  */
-void
+int
 ulib_vector_set_ptr (ulib_vector *v, unsigned int idx, void *data)
 {
-  if (idx >= v->navail)
-    grow (v, idx + 1);
+  if (idx >= v->navail && grow (v, idx + 1) < 0)
+    return -1;
 
   ((void **) v->data) [idx] = data;
   if (idx >= v->nelt)
     v->nelt = idx + 1;
+  return 0;
 }
 
 /* Set a function pointer element.  */
-void
+int
 ulib_vector_set_func (ulib_vector *v, unsigned int idx, ulib_func func)
 {
-  if (idx >= v->navail)
-    grow (v, idx + 1);
+  if (idx >= v->navail && grow (v, idx + 1) < 0)
+    return -1;
 
   ((ulib_func *) v->data) [idx] = func;
   if (idx >= v->nelt)
     v->nelt = idx + 1;
+  return 0;
 }
 
 /* Helper function to make available slot number IDX by moving
    elements [IDX, NELT) up.  */
-void
+int
 ulib__vector_moveup (ulib_vector *v, unsigned int idx)
 {
-  if (idx >= v->navail)
-    grow (v, idx + 1);
+  if (idx >= v->navail && grow (v, idx + 1) < 0)
+    return -1;
 
   if (idx < v->nelt)
     {
       char *dst = (char *) v->data + idx * v->elt_size;
       memmove (dst + v->elt_size, dst, v->nelt - idx);
     }
+
+  return 0;
 }
 
 /* Remove the element at IDX from the vector.  */
@@ -160,7 +194,7 @@ ulib_vector_remove (ulib_vector *v, unsigned int idx)
 {
   char *dst;
 
-  ulib_assert (idx < v->nelt);
+  assert (idx < v->nelt);
   v->nelt--;
   if (idx < v->nelt)
     {

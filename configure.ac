@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT(ulib, 1.0)
-AC_CONFIG_SRCDIR(ulib/alloc.c)
+AC_CONFIG_SRCDIR(ulib/cache.c)
 AC_CONFIG_HEADER(ulib/config.h)
 
 # Standard checks

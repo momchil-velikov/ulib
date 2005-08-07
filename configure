@@ -271,7 +271,7 @@ PACKAGE_VERSION='1.0'
 PACKAGE_STRING='ulib 1.0'
 PACKAGE_BUGREPORT=''
 
-ac_unique_file="ulib/alloc.c"
+ac_unique_file="ulib/cache.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

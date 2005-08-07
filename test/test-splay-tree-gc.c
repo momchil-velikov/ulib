@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-ulib_cache *uint_tree_cache;
+static ulib_cache *uint_tree_cache;
 
 static void
 uint_tree_ctor (void *_obj, unsigned int size __attribute__ ((unused)))
@@ -26,8 +26,8 @@ static int
 uint_tree_scan (void *_obj, void **objs, unsigned int n)
 {
   uint_tree *obj = (uint_tree *) _obj;
-  int cnt;
-
+  unsigned int cnt;
+  
   cnt = !!obj->left + !!obj->right;
   if (cnt > n)
     return -cnt;

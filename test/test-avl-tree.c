@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-ulib_cache *uint_tree_cache;
+static ulib_cache *uint_tree_cache;
 
 #define NLOOPS 10000000
 #define NKEYS 1000

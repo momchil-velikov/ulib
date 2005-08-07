@@ -8,7 +8,7 @@
 #define NLOOP 1000000
 #define NPTR 1000
 
-void *ptr[NPTR];
+static void *ptr[NPTR];
 
 static unsigned int
 calibrate ()

@@ -1,0 +1,13 @@
+tests = ['test-pgalloc', 'test-cache', 'test-splay-tree',
+         'test-splay-tree-gc', 'test-avl-tree']
+
+for prog in [smk.make_program (x, srcs = [x + '.c'], libs = [libulib])
+             for x in tests]:
+        smk.env.all.depends (prog)
+        smk.install ('bin', prog)
+
+# Local variables:
+# mode: python
+# indent-tabs-mode: nil
+# arch-tag: 7a1e8262-6482-409c-9ca9-bdf5d5888b5c
+# End:

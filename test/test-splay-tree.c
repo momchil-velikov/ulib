@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-ulib_cache *uint_tree_cache;
+static ulib_cache *uint_tree_cache;
 
 static void
 uint_tree_ctor (void *_obj, unsigned int size __attribute__ ((unused)))
