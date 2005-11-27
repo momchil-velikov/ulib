@@ -1,6 +1,6 @@
 #include "pgalloc.h"
 #include "list.h"
-#include "config.h"
+#include <ulib/config.h>
 
 #include <stdlib.h>
 

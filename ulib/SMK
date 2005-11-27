@@ -1,28 +1,28 @@
+smk.push_tools ()
+
+config_h = smk.make_keyword_subst (smk.env.host_cf, 'config.h')
+smk.env.all.depends (config_h)
+
 ulib_srcs = ['hash.c', 'vector.c', 'utf8.c', 'pgalloc.c', 'cache.c']
 
 ulib_hdrs = ['avl-tree.h', 'avl-tree.c', 'cache.h', 'defs.h',
              'hash.h', 'list.h', 'pgalloc.h', 'splay-tree.h',
              'splay-tree.c', 'utf8.h', 'vector.h']
 
-# Save the common compiler settings.  
-save_cc = smk.env.cc
-
 # Arrange the library objects to be compiled to Position Independent
 # Code.
-smk.env.cc = smk.clone (save_cc)
 smk.env.cc.pic = True
 
 # Build the library.  
 libulib = smk.make_shared_lib ('ulib', srcs = ulib_srcs)
-
-# Restore the original compiler settings.
-smk.env.cc = save_cc
 
 # Install the library and the headers.
 smk.install ('lib', libulib)
 if libulib.implib:
     smk.install ('lib', libulib.implib)
 smk.install ('include/ulib', ulib_hdrs)
+
+smk.pop_tools ()
 
 # Local variables:
 # mode: python

@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#include "config.h"
+#include <ulib/config.h>
 
 #if HAVE_INTTYPES_H
 #include <inttypes.h>
