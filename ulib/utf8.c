@@ -51,7 +51,7 @@ utf8_mbtowc (wchar_t *result, const char *_string, size_t n)
   wchar_t res;
   int len;
 
-  if ((len = utf8_mblen (string, n)) < 0)
+  if ((len = utf8_mblen (_string, n)) < 0)
     return -1;
 
   if (len == 1)
