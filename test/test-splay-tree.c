@@ -14,12 +14,13 @@
 
 static ulib_cache *uint_tree_cache;
 
-static void
+static int
 uint_tree_ctor (void *_obj, unsigned int size __attribute__ ((unused)))
 {
   uint_tree *obj = (uint_tree *) _obj;
 
   obj->left = obj->right = 0;
+  return 0;
 }
 
 #define NLOOPS 10000000

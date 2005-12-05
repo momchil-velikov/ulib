@@ -22,7 +22,7 @@ BEGIN_DECLS
 #define ULIB_CACHE_OBJECT_ALIGN_MAX 128
 
 /* Constructor/destructor/clear function type.  */
-typedef void (*ulib_ctor_func) (void *obj, unsigned int size);
+typedef int (*ulib_ctor_func) (void *obj, unsigned int size);
 typedef void (*ulib_clear_func) (void *obj, unsigned int size);
 typedef void (*ulib_dtor_func) (void *obj, unsigned int size);
 

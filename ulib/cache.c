@@ -123,13 +123,14 @@ struct root_data
 #include "splay-tree.c"
 
 /* Root object constructor.  */
-static void
+static int
 root_tree_ctor (void *_obj, unsigned int size __attribute__ ((unused)))
 {
   root_tree *obj = (root_tree *) _obj;
 
   obj->left = obj->right = 0;
   ulib_list_init (&obj->data.list);
+  return 0;
 }
 
 /* "Globals".  */
@@ -398,7 +399,6 @@ void *
 ulib_cache_alloc (ulib_cache *cache)
 {
   char *ptr;
-  int run_ctor;
   struct slab *slab;
   unsigned short index;
 
@@ -417,14 +417,19 @@ ulib_cache_alloc (ulib_cache *cache)
     {
       ptr = (char *) slab->objects + index * cache->size;
       slab->free = slab->ctl [index];
-      run_ctor = 0;
     }
   else
     {
       index = cache->object_count - SLAB_COUNT (slab);
       ptr = slab->offset;
+
+      /* Run the constructor if there is one.  */
+      if (cache->ctor && cache->ctor (ptr, cache->usize) < 0)
+        return 0;
+
+      /* The object was successfully constructed, we can move the
+         unallocated space pointer past the object's end.  */
       slab->offset = ptr + cache->size;
-      run_ctor = 1;
     }
 
   /* Mark the object as allocated, unreachable and record allocation
@@ -436,10 +441,6 @@ ulib_cache_alloc (ulib_cache *cache)
   slab->info--;
   if (SLAB_COUNT (slab) == 0)
     cache->free = (struct slab *) slab->list.next;
-
-  /* Run the constructor if there is one.  */
-  if (run_ctor && cache->ctor)
-    cache->ctor (ptr, cache->usize);
 
   return ptr;
 }
