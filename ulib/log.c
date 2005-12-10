@@ -49,56 +49,57 @@ ulib_log_length (const ulib_log *log)
 
 /* Get Nth message from the log.  */
 const char *
-ulib_log_message_get (const ulib_log *log, unsigned int idx)
+ulib_log_getmsg (const ulib_log *log, unsigned int idx)
 {
   return ulib_vector_ptr_elt (&log->msgs, idx);
 }
 
 /* Append a message to the log.  */
 int
-ulib_log_message_add (ulib_log *log, const char *fmt, ...)
+ulib_log_printf (ulib_log *log, const char *fmt, ...)
+{
+  int n;
+  va_list ap;
+
+  va_start (ap, fmt);
+  n = ulib_log_vprintf (log, fmt, ap);
+  va_end (ap);
+
+  return n;
+}
+
+int
+ulib_log_vprintf (ulib_log *log, const char *fmt, va_list ap)
 {
   const int DEFAULT_BUFSZ = 80;
-  va_list ap;
   char *buf;
   int n;
 
   if ((buf = malloc (DEFAULT_BUFSZ)) == 0)
-    {
-      errno = ENOMEM;
-      return -1;
-    }
+    goto error_exit;
 
-  va_start (ap, fmt);
-  n = vsnprintf (buf, DEFAULT_BUFSZ, fmt, ap);
-  va_end (ap);
-
-  if (n < 0)
+  if ((n = vsnprintf (buf, DEFAULT_BUFSZ, fmt, ap)) < 0)
     goto error;
   
   if (n >= DEFAULT_BUFSZ)
     {
       char *nbuf;
       if ((nbuf = realloc (buf, n + 1)) == 0)
-        goto enomem;
-
-      va_start (ap, fmt);
-      n = vsnprintf (nbuf, n, fmt, ap);
-      va_end (ap);
-
-      if (n < 0)
         goto error;
-
-      if (ulib_vector_append_ptr (&log->msgs, buf) < 0)
+      
+      buf = nbuf;
+      if ((n = vsnprintf (buf, n, fmt, ap)) < 0)
         goto error;
     }
 
+  if (ulib_vector_append_ptr (&log->msgs, buf) < 0)
+    goto error;
+
   return 0;
 
-enomem:
-  errno = ENOMEM;
 error:
   free (buf);
+error_exit:
   return -1;
 }
 
@@ -133,14 +134,14 @@ ulib_log_clear (ulib_log *log, unsigned int n)
 
 /* Output messages in the log to the IO stream STREAM.  */
 void
-ulib_log_print (ulib_log *log, FILE *stream)
+ulib_log_write (ulib_log *log, FILE *stream)
 {
-  ulib_log_fdprint (log, fileno (stream));
+  ulib_log_writefd (log, fileno (stream));
 }
 
 /* Output messages in the log to the file descriptor FD.  */
 void
-ulib_log_fdprint (ulib_log *log, int fd)
+ulib_log_writefd (ulib_log *log, int fd)
 {
   const char *msg;
   unsigned int i, n;

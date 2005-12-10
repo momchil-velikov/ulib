@@ -4,6 +4,7 @@
 #include "defs.h"
 #include "vector.h"
 #include <stdio.h>
+#include <stdarg.h>
 
 BEGIN_DECLS
 
@@ -28,20 +29,21 @@ void ulib_log_destroy (ulib_log *);
 unsigned int ulib_log_length (const ulib_log *);
 
 /* Get Nth message from the log.  */
-const char *ulib_log_message_get (const ulib_log *, unsigned int);
+const char *ulib_log_getmsg (const ulib_log *, unsigned int);
 
 /* Append a message to the log.  */
-int ulib_log_message_add (ulib_log *log, const char *fmt, ...);
+int ulib_log_printf (ulib_log *log, const char *fmt, ...);
+int ulib_log_vprintf (ulib_log *log, const char *fmt, va_list);
 
 /* Remove the oldest N messages from the log.  Remove all messages
    if N is zero.  */
 void ulib_log_clear (ulib_log *log, unsigned int n);
 
 /* Output messages in the log to the IO stream STREAM.  */
-void ulib_log_print (ulib_log *log, FILE *stream);
+void ulib_log_write (ulib_log *log, FILE *stream);
 
 /* Output messages in the log to the file descriptor FD.  */
-void ulib_log_fdprint (ulib_log *log, int fd);
+void ulib_log_writefd (ulib_log *log, int fd);
 
 END_DECLS
 
