@@ -122,6 +122,16 @@ ulib_vector_set_size (ulib_vector *v, unsigned int sz)
   return 0;
 }
 
+/* Ensure vector V has at least N elements.  */
+int
+ulib_vector_atleast (ulib_vector *v, unsigned int n)
+{
+  if (n <= v->nelt)
+    return 0;
+  else
+    return ulib_vector_set_size (v, n);
+}
+
 /* Preallocate a number of elements in the vector.  */
 int
 ulib_vector_reserve (ulib_vector *v, unsigned int req)

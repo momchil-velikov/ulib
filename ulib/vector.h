@@ -71,6 +71,9 @@ ulib_vector_length (const ulib_vector *v)
 /* Set the number of elements in the vector.  */
 int ulib_vector_set_size (ulib_vector *, unsigned int);
 
+/* Ensure vector V has at least N elements.  */
+int ulib_vector_atleast (ulib_vector *v, unsigned int n);
+
 /* Change the number of elements in the vector by adding signed N to
    the current size.  */
 static inline int
