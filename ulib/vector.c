@@ -115,8 +115,17 @@ grow (ulib_vector *v, unsigned int req)
 int
 ulib_vector_set_size (ulib_vector *v, unsigned int sz)
 {
-  if (sz > v->navail && grow (v, sz) < 0)
-    return -1;
+  if (sz > v->navail)
+    {
+      if (grow (v, sz) < 0)
+        return -1;
+    }
+  else if (sz > v->nelt)
+    {
+      memset ((char *) v->data + v->nelt * v->elt_size, 0,
+              (sz - v->nelt) * v->elt_size);
+      
+    }
   
   v->nelt = sz;
   return 0;
