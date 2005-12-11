@@ -41,9 +41,9 @@ uint_tree_scan (void *_obj, void **objs, unsigned int n)
   return cnt;
 }
 
-#define NLOOPS 10000000
-#define NKEYS 1000
-#define GCSTEP 1000
+#define NLOOPS 10000000U
+#define NKEYS 1000U
+#define GCSTEP 1000U
 
 static void check_less_than (uint_tree *node, unsigned int key);
 static void check_greater_than (uint_tree *node, unsigned int key);
@@ -176,13 +176,13 @@ main ()
   if (root)
     check_tree (root);
 
-  tm = tv2.tv_sec + tv2.tv_usec / 1e6 - tv1.tv_sec - tv1.tv_usec / 1e6;
+  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
 
-  printf ("time = %f s\n", tm);
-  printf ("nins = %d, ndel = %d\n", nins, ndel);
-  printf ("nalloc = %d\n", NLOOPS);
+  printf ("time = %f s\n", tm / 1e6);
+  printf ("nins = %u, ndel = %u\n", nins, ndel);
+  printf ("nalloc = %u\n", NLOOPS);
   printf ("avg alloc+ins+del+gc = %f us\n",
-	  1e6 * tm / (NLOOPS + nins + ndel + ngc));
+	  tm / (NLOOPS + nins + ndel + ngc));
   return 0;
 }
 

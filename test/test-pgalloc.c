@@ -77,19 +77,19 @@ main ()
   gettimeofday (&tv1, 0);
   count = calibrate ();
   gettimeofday (&tv2, 0);
-  over = tv2.tv_sec + tv2.tv_usec / 1e6 - tv1.tv_sec - tv1.tv_usec / 1e6;
+  over = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
 
   gettimeofday (&tv1, 0);
   count = test ();
   gettimeofday (&tv2, 0);
-  tm = tv2.tv_sec + tv2.tv_usec / 1e6 - tv1.tv_sec - tv1.tv_usec / 1e6;
+  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
   tm -= over;
   alloc = count * ulib_pgsize () / 1048576;
 
-  printf ("count = %d, alloc = %d MiB, time = %f, real = %f s\n",
-	  count, alloc, tm, tm + over);
-  printf ("avg alloc/free = %f us per call\n", 1e6 * tm / count);
-  printf ("avg alloc/free = %f us per MiB\n", 1e6 * tm / alloc);
+  printf ("count = %u, alloc = %u MiB, time = %f, real = %f s\n",
+	  count, alloc, tm / 1e6, (tm + over) / 1e6);
+  printf ("avg alloc/free = %f us per call\n", tm / count);
+  printf ("avg alloc/free = %f us per MiB\n", tm / alloc);
   return 0;
 }
 

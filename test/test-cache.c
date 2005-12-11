@@ -50,12 +50,12 @@ main ()
     }
   gettimeofday (&tv2, 0);
 
-  tm = tv2.tv_sec + tv2.tv_usec / 1e6 - tv1.tv_sec - tv1.tv_usec / 1e6;
+  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
 
   alloc /= 1048576;
-  printf ("calls = %d, alloc = %d MiB, time = %f s\n",
-	  count, alloc, tm);
-  printf ("avg %f us per alloc/free\n", 1e6 * tm / count);
+  printf ("calls = %u, alloc = %u MiB, time = %f s\n",
+	  count, alloc, tm / 1e6);
+  printf ("avg %f us per alloc/free\n", tm / count);
   return 0;
 }
 
