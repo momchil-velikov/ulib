@@ -222,8 +222,11 @@ ulib_vector_remove_last (ulib_vector *v)
   v->nelt--;
 }
 
-END_DECLS
+/* Copy a vector.  Both vectors must be initialized with compatible
+   parameters. */
+int ulib_vector_copy (ulib_vector *dst, const ulib_vector *src);
 
+END_DECLS
 #endif /* ulib__vector_h */
 
 /*

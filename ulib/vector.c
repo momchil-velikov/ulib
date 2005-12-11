@@ -221,6 +221,18 @@ ulib_vector_remove (ulib_vector *v, unsigned int idx)
       memmove (dst, dst + v->elt_size, v->nelt - idx);
     }
 }
+
+/* Copy a vector.  Both vectors must be initialized with compatible
+   parameters. */
+int
+ulib_vector_copy (ulib_vector *dst, const ulib_vector *src)
+{
+  if (ulib_vector_set_size (dst, src->nelt) < 0)
+    return -1;
+
+  memcpy (dst->data, src->data, src->nelt * src->elt_size);
+  return 0;
+}
 
 /*
  * Local variables:
