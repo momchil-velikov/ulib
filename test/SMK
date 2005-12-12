@@ -1,5 +1,5 @@
 tests = ['test-pgalloc', 'test-cache', 'test-splay-tree',
-         'test-splay-tree-gc', 'test-avl-tree']
+         'test-splay-tree-gc', 'test-avl-tree', 'test-bitset']
 
 for prog in [smk.make_program (x, srcs = [x + '.c'], libs = [libulib])
              for x in tests]:
