@@ -1,4 +1,5 @@
 #include <ulib/pgalloc.h>
+#include <ulib/rand.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,7 @@ calibrate ()
 
   for (i = 0; i < NLOOP; i++)
     {
-      idx = rand () % NPTR;
+      idx = ulib_rand (0, NPTR - 1);
       if (ptr [idx] != 0)
 	ptr [idx] = 0;
 
@@ -40,7 +41,7 @@ test ()
 
   for (i = 0; i < NLOOP; i++)
     {
-      idx = rand () % NPTR;
+      idx = ulib_rand (0, NPTR - 1);
       if (ptr [idx] != 0)
 	{
 	  ulib_pgfree (ptr [idx]);

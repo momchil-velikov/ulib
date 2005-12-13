@@ -1,4 +1,5 @@
 #include <ulib/cache.h>
+#include <ulib/rand.h>
 
 #define ULIB_AVL_TREE_KEY_TYPE unsigned int
 #define ULIB_AVL_TREE_TYPE uint_tree
@@ -86,7 +87,7 @@ dump_tree (uint_tree *t, int level)
     }
 }
 
-static unsigned int key [NKEYS + 1];
+static unsigned int key [NKEYS];
 static uint_tree *root;
 
 static unsigned int nins, ndel;
@@ -99,7 +100,7 @@ test ()
 
   for (i = 0; i < NLOOPS; i++)
     {
-      idx = rand () % NKEYS + 1;
+      idx = ulib_rand (0, NKEYS - 1);
       if (key [idx])
 	{
 	  elt = uint_tree_delete (&root, key [idx]);
@@ -110,19 +111,19 @@ test ()
 	}
 
       elt = ulib_cache_alloc (uint_tree_cache);
-      elt->key = key [idx] = rand () % NKEYS + 1;
+      elt->key = key [idx] = ulib_rand (0, NKEYS - 1);
       while (uint_tree_insert (&root, elt) < 0)
 	{
 	  nins++;
 	  ulib_cache_free (uint_tree_cache, elt);
 	  elt = uint_tree_delete (&root, key [idx]);
 	  ndel++;
-	  elt->key = key [idx] = rand () % NKEYS + 1;
+	  elt->key = key [idx] = ulib_rand (0, NKEYS - 1);
 	}
       nins++;
     }
 
-  for (i = 1; i <= NKEYS; i++)
+  for (i = 0; i < NKEYS; i++)
     if (key [i])
       {
 	elt = uint_tree_delete (&root, key [i]);

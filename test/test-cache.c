@@ -1,4 +1,5 @@
 #include <ulib/cache.h>
+#include <ulib/rand.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,7 +30,7 @@ main ()
 
       for (pidx = 0; pidx < NLOOP; pidx++)
 	{
-	  i = rand () % NPTR;
+	  i = ulib_rand (0, NPTR - 1);
 	  if (ptr [cidx][i] != 0)
 	    {
 	      ulib_cache_free (cache [cidx], ptr [cidx][i]);

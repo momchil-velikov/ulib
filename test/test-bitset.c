@@ -1,4 +1,5 @@
 #include <ulib/bitset.h>
+#include <ulib/rand.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -17,13 +18,6 @@
 
 static ulib_bitset *set [NSETS_MAX];
 
-/* Generate a random bit number in the range [0, mx).  */
-static inline unsigned int
-random_uint (unsigned int mx)
-{
-  return (unsigned int) ((mx - 1) * (rand () / (double) RAND_MAX));
-}
-
 /* Generate a random set of NBITS elements.  */
 static void
 random_set (unsigned int nbits, ulib_bitset *set)
@@ -32,7 +26,7 @@ random_set (unsigned int nbits, ulib_bitset *set)
 
   for (i = 0; i < nbits; ++i)
     {
-      n = random_uint (BITS_MAX);
+      n = ulib_rand (0, BITS_MAX - 1);
       ulib_bitset_set (set, n);
     }
 }
@@ -176,9 +170,9 @@ test_bitset_union ()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s1 = random_uint (NSETS_MAX);
-          s2 = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s1 || d == s2 || s1 == s2);
 
@@ -199,8 +193,8 @@ test_bitset_union_inplace ()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s);
 
@@ -223,9 +217,9 @@ test_bitset_intersection()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s1 = random_uint (NSETS_MAX);
-          s2 = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s1 || d == s2 || s1 == s2);
 
@@ -246,8 +240,8 @@ test_bitset_intersection_inplace ()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s);
 
@@ -270,9 +264,9 @@ test_bitset_difference ()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s1 = random_uint (NSETS_MAX);
-          s2 = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s1 || d == s2 || s1 == s2);
 
@@ -293,8 +287,8 @@ test_bitset_difference_inplace ()
     {
       do
         {
-          d = random_uint (NSETS_MAX);
-          s = random_uint (NSETS_MAX);
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s = ulib_rand (0, NSETS_MAX - 1);
         }
       while (d == s);
 
