@@ -81,10 +81,29 @@ bitset_elt_ffs (bitset_elt elt)
   return sizeof (bitset_elt) * CHAR_BIT - (k + msb_set_tab [elt]);
 }
 
+/* Return one plus the index of the last used array element.  */
+static unsigned int
+used_len (const ulib_bitset *set)
+{
+  unsigned int i;
+  bitset_elt *elt;
+
+  if (set->used_len == 0)
+    return 0;
+
+  i = set->used_len - 1;
+  elt = ulib_vector_elt (&set->bits, i);
+  while (*elt == 0 && i-- > 0)
+    --elt;
+
+  return i + 1;
+}
+
 /* Initialize a bit set.  */
 int
 ulib_bitset_init (ulib_bitset *set)
 {
+  set->used_len = 0;
   return ulib_vector_init (&set->bits, ULIB_ELT_SIZE, sizeof (bitset_elt), 0);
 }
 
@@ -100,12 +119,16 @@ int
 ulib_bitset_set (ulib_bitset *set, unsigned int n)
 {
   bitset_elt *elt;
+  unsigned int idx = elt_index (n);
 
-  if (ulib_vector_atleast (&set->bits, elt_index (n) + 1) < 0)
+  if (ulib_vector_atleast (&set->bits, idx + 1) < 0)
     return -1;
 
-  elt = (bitset_elt *) ulib_vector_elt (&set->bits, elt_index (n));
+  elt = (bitset_elt *) ulib_vector_elt (&set->bits, idx);
   *elt |= 1U << bit_index (n);
+
+  if (set->used_len <= idx)
+    set->used_len = idx + 1;
 
   return 0;
 }
@@ -114,12 +137,17 @@ ulib_bitset_set (ulib_bitset *set, unsigned int n)
 void
 ulib_bitset_clear (ulib_bitset *set, unsigned int n)
 {
-  if (elt_index (n) < ulib_vector_length (&set->bits))
+  unsigned int idx = elt_index (n);
+
+  if (idx < ulib_vector_length (&set->bits))
     {
       bitset_elt *elt;
 
-      elt = (bitset_elt *) ulib_vector_elt (&set->bits, elt_index (n));
-      *elt &= ~(1U << bit_index (n));
+      elt = (bitset_elt *) ulib_vector_front (&set->bits);
+      elt [idx] &= ~(1U << bit_index (n));
+
+      if (idx + 1 == set->used_len)
+        set->used_len = used_len (set);
     }
 }
 
@@ -127,13 +155,15 @@ ulib_bitset_clear (ulib_bitset *set, unsigned int n)
 int
 ulib_bitset_isset (const ulib_bitset *set, unsigned int n)
 {
-  if (elt_index (n) >= ulib_vector_length (&set->bits))
+  unsigned int idx = elt_index (n);
+
+  if (idx >= ulib_vector_length (&set->bits))
     return 0;
   else
     {
       bitset_elt *elt;
 
-      elt = (bitset_elt *) ulib_vector_elt (&set->bits, elt_index (n));
+      elt = (bitset_elt *) ulib_vector_elt (&set->bits, idx);
 
       return *elt & (1U << bit_index (n));
     }
@@ -147,26 +177,24 @@ ulib_bitset_union (ulib_bitset *dst, const ulib_bitset *src1,
   unsigned int i, mn, mx;
   bitset_elt *d, *s1, *s2;
 
-  mx = max_uint (ulib_vector_length (&src1->bits),
-                 ulib_vector_length (&src2->bits));
-
+  mx = max_uint (src1->used_len, src2->used_len);
+  
   if (ulib_vector_set_size (&dst->bits, mx) < 0)
     return -1;
-
+  dst->used_len = mx;
   if (mx == 0)
     return 0;
 
-  mn = min_uint (ulib_vector_length (&src1->bits),
-                 ulib_vector_length (&src2->bits));
+  mn = min_uint (src1->used_len, src2->used_len);
 
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s1 = (bitset_elt *) ulib_vector_elt (&src1->bits, 0);
-  s2 = (bitset_elt *) ulib_vector_elt (&src2->bits, 0);
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s1 = (bitset_elt *) ulib_vector_front (&src1->bits);
+  s2 = (bitset_elt *) ulib_vector_front (&src2->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ = *s1++ | *s2++;
 
-  if (i < ulib_vector_length (&src2->bits))
+  if (i < src2->used_len)
     s1 = s2;
 
   for (; i < mx; ++i)
@@ -182,29 +210,25 @@ ulib_bitset_union_inplace (ulib_bitset *dst, const ulib_bitset *src)
   unsigned int i, mn, mx;
   bitset_elt *d, *s;
 
-  mx = max_uint (ulib_vector_length (&dst->bits),
-                 ulib_vector_length (&src->bits));
-
-  if (mx == 0)
+  if ((mx = max_uint (dst->used_len, src->used_len)) == 0)
     return 0;
 
   if (ulib_vector_set_size (&dst->bits, mx) < 0)
     return -1;
 
-  mn = min_uint (ulib_vector_length (&dst->bits),
-                 ulib_vector_length (&src->bits));
-
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s = (bitset_elt *) ulib_vector_elt (&src->bits, 0);
+  mn = min_uint (dst->used_len, src->used_len);
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s = (bitset_elt *) ulib_vector_front (&src->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ |= *s++;
 
-  if (i < ulib_vector_length (&src->bits))
+  if (i < src->used_len)
     {
       for (; i < mx; ++i)
         *d++ = *s++;
     }
+  dst->used_len = mx;
 
   return 0;
 }
@@ -217,21 +241,23 @@ ulib_bitset_intersection (ulib_bitset *dst, const ulib_bitset *src1,
   unsigned int i, mn;
   bitset_elt *d, *s1, *s2;
 
-  mn = min_uint (ulib_vector_length (&src1->bits),
-                 ulib_vector_length (&src2->bits));
+  mn = min_uint (src1->used_len, src2->used_len);
 
   if (ulib_vector_set_size (&dst->bits, mn) < 0)
     return -1;
-
+  dst->used_len = mn;
   if (mn == 0)
     return 0;
 
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s1 = (bitset_elt *) ulib_vector_elt (&src1->bits, 0);
-  s2 = (bitset_elt *) ulib_vector_elt (&src2->bits, 0);
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s1 = (bitset_elt *) ulib_vector_front (&src1->bits);
+  s2 = (bitset_elt *) ulib_vector_front (&src2->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ = *s1++ & *s2++;
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
 
   return 0;
 }
@@ -243,20 +269,22 @@ ulib_bitset_intersection_inplace (ulib_bitset *dst, const ulib_bitset *src)
   unsigned int i, mn;
   bitset_elt *d, *s;
 
-  mn = min_uint (ulib_vector_length (&dst->bits),
-                 ulib_vector_length (&src->bits));
+  mn = min_uint (dst->used_len, src->used_len);
 
   if (ulib_vector_set_size (&dst->bits, mn) < 0)
     return -1;
-
+  dst->used_len = mn;
   if (mn == 0)
     return 0;
 
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s = (bitset_elt *) ulib_vector_elt (&src->bits, 0);
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s = (bitset_elt *) ulib_vector_front (&src->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ &= *s++;
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
 
   return 0;
 }
@@ -269,20 +297,29 @@ ulib_bitset_difference (ulib_bitset *dst, const ulib_bitset *src1,
   unsigned int i, mn;
   bitset_elt *d, *s1, *s2;
 
-  if (ulib_vector_set_size (&dst->bits, ulib_vector_length (&src1->bits)) < 0)
+  if (ulib_vector_set_size (&dst->bits, src1->used_len))
     return -1;
-
-  mn = min_uint (ulib_vector_length (&src1->bits),
-                 ulib_vector_length (&src2->bits));
-  if (mn == 0)
+  dst->used_len = src1->used_len;
+  if (dst->used_len == 0)
     return 0;
 
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s1 = (bitset_elt *) ulib_vector_elt (&src1->bits, 0);
-  s2 = (bitset_elt *) ulib_vector_elt (&src2->bits, 0);
+  mn = min_uint (src1->used_len, src2->used_len);
+
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s1 = (bitset_elt *) ulib_vector_front (&src1->bits);
+  s2 = (bitset_elt *) ulib_vector_front (&src2->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ = *s1++ & ~ *s2++;
+
+  if (i < src1->used_len)
+    {
+      for (; i < src1->used_len; ++i)
+        *d++ = *s1++;
+    }
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
 
   return 0;
 }
@@ -294,16 +331,18 @@ ulib_bitset_difference_inplace (ulib_bitset *dst, const ulib_bitset *src)
   unsigned int i, mn;
   bitset_elt *d, *s;
 
-  mn = min_uint (ulib_vector_length (&dst->bits),
-                 ulib_vector_length (&src->bits));
+  mn = min_uint (dst->used_len, src->used_len);
   if (mn == 0)
     return 0;
 
-  d = (bitset_elt *) ulib_vector_elt (&dst->bits, 0);
-  s = (bitset_elt *) ulib_vector_elt (&src->bits, 0);
+  d = (bitset_elt *) ulib_vector_front (&dst->bits);
+  s = (bitset_elt *) ulib_vector_front (&src->bits);
 
   for (i = 0; i < mn; ++i)
     *d++ &= ~ *s++;
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
 
   return 0;
 }
@@ -312,20 +351,15 @@ ulib_bitset_difference_inplace (ulib_bitset *dst, const ulib_bitset *src)
 unsigned int
 ulib_bitset_max (const ulib_bitset *set)
 {
-  unsigned int i;
   bitset_elt *elt;
 
-  if ((i = ulib_vector_length (&set->bits)) == 0)
+  if (set->used_len == 0)
     return 0;
 
-  elt = ulib_vector_back (&set->bits);
-  while (i--)
-    {
-      if (*--elt)
-        return i * sizeof (bitset_elt) * CHAR_BIT + bitset_elt_ffs (*elt) + 1;
-    }
-
-  return 0;
+  elt = ulib_vector_elt (&set->bits, set->used_len - 1);
+  return ((set->used_len - 1) * sizeof (bitset_elt) * CHAR_BIT
+          + bitset_elt_ffs (*elt)
+          + 1);
 }
 
 /*

@@ -10,6 +10,9 @@ struct ulib_bitset
 {
   /* Bit vector.  */
   ulib_vector bits;
+
+  /* Index of the last used element.  */
+  unsigned int used_len;
 };
 typedef struct ulib_bitset ulib_bitset;
 
