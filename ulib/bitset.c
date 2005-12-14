@@ -318,13 +318,11 @@ ulib_bitset_max (const ulib_bitset *set)
   if ((i = ulib_vector_length (&set->bits)) == 0)
     return 0;
 
-  elt = ulib_vector_last_elt (&set->bits);
+  elt = ulib_vector_back (&set->bits);
   while (i--)
     {
-      if (*elt)
+      if (*--elt)
         return i * sizeof (bitset_elt) * CHAR_BIT + bitset_elt_ffs (*elt) + 1;
-
-      --elt;
     }
 
   return 0;

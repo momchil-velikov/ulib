@@ -108,12 +108,18 @@ ulib_vector_elt (const ulib_vector *v, unsigned int idx)
   return (char *) v->data + idx * v->elt_size;
 }
 
-/* Get a pointer to the last element. */
+/* Get a pointer to the first element.  */
 static inline void *
-ulib_vector_last_elt (const ulib_vector *v)
+ulib_vector_front (const ulib_vector *v)
 {
-  assert (v->nelt > 0);
-  return (char *) v->data + (v->nelt - 1) * v->elt_size;
+  return v->data;
+}
+
+/* Get a pointer one past the last element. */
+static inline void *
+ulib_vector_back (const ulib_vector *v)
+{
+  return (char *) v->data + v->nelt * v->elt_size;
 }
 
 /* Set a data pointer element.  */
@@ -127,14 +133,6 @@ ulib_vector_ptr_elt (const ulib_vector *v, unsigned int idx)
   return ((void **) v->data) [idx];
 }
 
-/* Get the value of the last data pointer element.  */
-static inline void *
-ulib_vector_last_ptr_elt (const ulib_vector *v)
-{
-  assert (v->nelt > 0);
-  return ((void **) v->data) [v->nelt - 1];
-}
-
 /* Set a function pointer element.  */
 int ulib_vector_set_func (ulib_vector *, unsigned int, ulib_func);
 
@@ -144,14 +142,6 @@ ulib_vector_func_elt (const ulib_vector *v, unsigned int idx)
 {
   assert (idx < v->nelt);
   return ((ulib_func *) v->data) [idx];
-}
-
-/* Get the value of the last function poiner element.  */
-static inline ulib_func
-ulib_vector_last_func_elt (const ulib_vector *v)
-{
-  assert (v->nelt > 0);
-  return ((ulib_func *) v->data) [v->nelt - 1];
 }
 
 /* Append an element to the vector.  */
