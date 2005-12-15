@@ -4,6 +4,12 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H %(have_inttypes_h)s
 
+/* Define to 1 if the system has the <unistd.h> header file.  */
+#define HAVE_UNISTD_H %(have_unistd_h)s
+
+/* Define to 1 if the system has the <io.h> header file.  */
+#define HAVE_IO_H %(have_io_h)s
+
 /* Define to 1 if the system has the type `uintptr_t'. */
 #define HAVE_UINTPTR_T %(have_uintptr_t)s
 

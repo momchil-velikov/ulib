@@ -1,9 +1,9 @@
 #include <ulib/cache.h>
 #include <ulib/rand.h>
+#include <ulib/time.h>
+
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #define NLOOP 1000000
 #define NPTR 5000
@@ -15,12 +15,12 @@ static ulib_cache *cache[NCACHE];
 int
 main ()
 {
-  struct timeval tv1, tv2;
+  ulib_time ts1, ts2;
   unsigned int size, cidx, pidx, i;
   double tm;
   unsigned int count = 0, alloc = 0;
-
-  gettimeofday (&tv1, 0);
+  
+  ulib_gettime (&ts1);
   for (size = 8, cidx = 0; cidx < NCACHE; cidx++)
     {
       size *= 1.2;
@@ -49,9 +49,9 @@ main ()
 
       ulib_cache_flush (cache [cidx]);
     }
-  gettimeofday (&tv2, 0);
+  ulib_gettime (&ts2);
 
-  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
+  tm = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
 
   alloc /= 1048576;
   printf ("calls = %u, alloc = %u MiB, time = %f s\n",

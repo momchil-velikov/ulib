@@ -1,7 +1,20 @@
 #include "log.h"
 #include <stdarg.h>
 #include <errno.h>
+
+#include <ulib/config.h>
+
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if HAVE_IO_H
+#include <io.h>
+#endif
+
+#ifdef _WIN32
+#define vsnprintf _vsnprintf
+#endif
 
 /* Initialize a log.  */
 int

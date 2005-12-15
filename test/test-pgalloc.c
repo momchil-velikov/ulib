@@ -1,10 +1,10 @@
 #include <ulib/pgalloc.h>
 #include <ulib/rand.h>
+#include <ulib/time.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/time.h>
 
 #define NLOOP 1000000
 #define NPTR 1000
@@ -72,18 +72,18 @@ int
 main ()
 {
   unsigned int count, alloc;
-  struct timeval tv1, tv2;
+  ulib_time ts1, ts2;
   double over, tm;
 
-  gettimeofday (&tv1, 0);
+  ulib_gettime (&ts1);
   count = calibrate ();
-  gettimeofday (&tv2, 0);
-  over = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
+  ulib_gettime (&ts2);
+  over = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
 
-  gettimeofday (&tv1, 0);
+  ulib_gettime (&ts1);
   count = test ();
-  gettimeofday (&tv2, 0);
-  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
+  ulib_gettime (&ts2);
+  tm = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
   tm -= over;
   alloc = count * ulib_pgsize () / 1048576;
 

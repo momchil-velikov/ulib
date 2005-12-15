@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <sys/time.h>
+#include <ulib/time.h>
 
 #define BITS_MAX 1024U
 #define BITS_PER_SET 500
@@ -302,56 +302,55 @@ test_bitset_difference_inplace ()
 
 /* Compute timestamp difference. Result in microsseconds.  */
 static double
-diffts (const struct timeval *begin, const struct timeval *end)
+diffts (const ulib_time *begin, const ulib_time *end)
 {
-  return (end->tv_sec * 1e6 + end->tv_usec
-          - begin->tv_sec * 1e6 - begin->tv_usec);
+  return (end->sec * 1e6 + end->usec - begin->sec * 1e6 - begin->usec);
 }
 
 int
 main ()
 {
-  struct timeval ts1, ts2;
+  ulib_time ts1, ts2;
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_union ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("union: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_union_inplace ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("union[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_intersection ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("intersection: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_intersection_inplace ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("intersection[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_difference ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("difference: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
-  gettimeofday (&ts1, 0);
+  ulib_gettime (&ts1);
   test_bitset_difference_inplace ();
-  gettimeofday (&ts2, 0);
+  ulib_gettime (&ts2);
   destroy_sets ();
   printf ("difference[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
   

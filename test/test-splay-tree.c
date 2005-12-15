@@ -1,5 +1,6 @@
 #include <ulib/cache.h>
 #include <ulib/rand.h>
+#include <ulib/time.h>
 
 #define ULIB_SPLAY_TREE_KEY_TYPE unsigned int
 #define ULIB_SPLAY_TREE_TYPE uint_tree
@@ -10,8 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/time.h>
 
 static ulib_cache *uint_tree_cache;
 
@@ -123,7 +122,7 @@ test ()
 int
 main ()
 {
-  struct timeval tv1, tv2;
+  ulib_time ts1, ts2;
   double tm;
 
   setvbuf (stdout, 0, _IONBF, 0);
@@ -133,14 +132,14 @@ main ()
 		       ULIB_CACHE_ALIGN, sizeof (void *),
 		       ULIB_CACHE_CTOR, uint_tree_ctor,
 		       0);
-  gettimeofday (&tv1, 0);
+  ulib_gettime (&ts1);
   test ();
-  gettimeofday (&tv2, 0);
+  ulib_gettime (&ts2);
 
   if (root)
     check_tree (root);
 
-  tm = tv2.tv_sec * 1e6 + tv2.tv_usec - tv1.tv_sec * 1e6 - tv1.tv_usec;
+  tm = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
 
   printf ("time = %f s\n", tm / 1e6);
   printf ("nins = %u, ndel = %u\n", nins, ndel);
