@@ -32,29 +32,35 @@ void ulib_bitset_clear (ulib_bitset *set, unsigned int n);
 int ulib_bitset_isset (const ulib_bitset *set, unsigned int n);
 
 /* Set theoretic union: DST = SRC1 + SRC2.  */
-int ulib_bitset_union (ulib_bitset *dst, const ulib_bitset *src1,
-                       const ulib_bitset *src2);
+int ulib_bitset_union (ulib_bitset *restrict dst,
+                       const ulib_bitset *restrict src1,
+                       const ulib_bitset *restrict src2);
 
 /* In-place set theoretic union: DST += SRC.  */
-int ulib_bitset_union_inplace (ulib_bitset *dst, const ulib_bitset *src);
+int ulib_bitset_union_inplace (ulib_bitset *restrict dst,
+                               const ulib_bitset *restrict src);
 
 /* Set theoretic intersection: DST = SRC1 * SRC2.  */
-int ulib_bitset_intersection (ulib_bitset * dst, const ulib_bitset *src1,
-                              const ulib_bitset *src2);
+int ulib_bitset_intersection (ulib_bitset *restrict dst,
+                              const ulib_bitset *restrict src1,
+                              const ulib_bitset *restrict src2);
 
 /* In-place set theoretic intersection: DST *= SRC.  */
-int ulib_bitset_intersection_inplace (ulib_bitset *dst, const ulib_bitset *src);
+int ulib_bitset_intersection_inplace (ulib_bitset *restrict dst,
+                                      const ulib_bitset *restrict src);
 
 /* Set theoretic difference: DST = SRC1 - SRC2.  */
-int ulib_bitset_difference (ulib_bitset * dst, const ulib_bitset *src1,
-                            const ulib_bitset *src2);
+int ulib_bitset_difference (ulib_bitset *restrict dst,
+                            const ulib_bitset *restrict src1,
+                            const ulib_bitset *restrict src2);
 
 /* In-place set theoretic difference: DST -= SRC.  */
-int ulib_bitset_difference_inplace (ulib_bitset *dst, const ulib_bitset *src);
+int ulib_bitset_difference_inplace (ulib_bitset *restrict dst,
+                                    const ulib_bitset *restrict src);
 
 /* Copy a bitset.  */
 static inline int
-ulib_bitset_copy (ulib_bitset *dst, const ulib_bitset *src)
+ulib_bitset_copy (ulib_bitset *restrict dst, const ulib_bitset *restrict src)
 {
   return ulib_vector_copy (&dst->bits, &src->bits);
 }
