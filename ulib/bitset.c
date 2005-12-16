@@ -131,9 +131,10 @@ ulib_bitset_set (ulib_bitset *set, unsigned int n)
     return -1;
 
   elt = ulib_vector_front (&set->bits);
-  if (idx + 1 >= set->used_len)
+  if (set->used_len < idx + 1)
     {
-      memset (elt + set->used_len, 0, idx - set->used_len + 1);
+      memset (elt + set->used_len, 0,
+              (idx - set->used_len + 1) * sizeof (bitset_elt));
       set->used_len = idx + 1;
     }
   elt [idx] |= 1U << bit_index (n);
