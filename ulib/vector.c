@@ -13,7 +13,7 @@ ulib_vector_init (ulib_vector *v, ...)
   va_start (ap, v);
 
   memset (v, 0, sizeof (ulib_vector));
-  v->scale = 1;
+  v->scale = 2;
 
   do
     {
