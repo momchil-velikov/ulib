@@ -62,7 +62,11 @@ int ulib_bitset_difference_inplace (ulib_bitset *restrict dst,
 static inline int
 ulib_bitset_copy (ulib_bitset *restrict dst, const ulib_bitset *restrict src)
 {
-  return ulib_vector_copy (&dst->bits, &src->bits);
+  if (ulib_vector_copy (&dst->bits, &src->bits) < 0)
+    return -1;
+
+  dst->used_len = src->used_len;
+  return 0;
 }
 
 /* Return the one plus the index of the last bit set.  */
