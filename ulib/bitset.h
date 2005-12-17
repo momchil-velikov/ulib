@@ -52,6 +52,11 @@ int ulib_bitset_union (ulib_bitset *restrict dst,
 int ulib_bitset_union_inplace (ulib_bitset *restrict dst,
                                const ulib_bitset *restrict src);
 
+/* In-place set theoretic union: DST += SRC.  Returns negative on
+   error, positive if the DST changed or zero otherwise.  */
+int ulib_bitset_union_inplace_chg (ulib_bitset *restrict dst,
+                                   const ulib_bitset *restrict src);
+
 /* Set theoretic intersection: DST = SRC1 * SRC2.  */
 int ulib_bitset_intersection (ulib_bitset *restrict dst,
                               const ulib_bitset *restrict src1,
@@ -61,6 +66,11 @@ int ulib_bitset_intersection (ulib_bitset *restrict dst,
 int ulib_bitset_intersection_inplace (ulib_bitset *restrict dst,
                                       const ulib_bitset *restrict src);
 
+/* In-place set theoretic intersection: DST *= SRC.  Returns negative
+   on error, positive if the DST changed or zero otherwise. */
+int ulib_bitset_intersection_inplace_chg (ulib_bitset *restrict dst,
+                                          const ulib_bitset *restrict src);
+
 /* Set theoretic difference: DST = SRC1 - SRC2.  */
 int ulib_bitset_difference (ulib_bitset *restrict dst,
                             const ulib_bitset *restrict src1,
@@ -69,6 +79,11 @@ int ulib_bitset_difference (ulib_bitset *restrict dst,
 /* In-place set theoretic difference: DST -= SRC.  */
 int ulib_bitset_difference_inplace (ulib_bitset *restrict dst,
                                     const ulib_bitset *restrict src);
+
+/* In-place set theoretic difference: DST -= SRC.  Returns negative on
+   error, positive if the DST changed or zero otherwise.  */
+int ulib_bitset_difference_inplace_chg (ulib_bitset *restrict dst,
+                                        const ulib_bitset *restrict src);
 
 /* Copy a bitset.  */
 static inline int

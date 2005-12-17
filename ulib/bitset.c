@@ -119,6 +119,7 @@ ulib_bitset_destroy (ulib_bitset *set)
 {
   ulib_vector_destroy (&set->bits);
 }
+
 
 /* Set bit N in the bitset SET.  */
 int
@@ -180,7 +181,7 @@ ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
 
   return 0;
 }
-
+
 
 /* Clear bit N in the bitset SET.  */
 void
@@ -239,6 +240,7 @@ ulib_bitset_is_set (const ulib_bitset *set, unsigned int n)
       return *elt & (1U << bit_index (n));
     }
 }
+
 
 /* Set theoretic union: DST = SRC1 + SRC2.  */
 int
@@ -309,6 +311,46 @@ ulib_bitset_union_inplace (ulib_bitset *restrict dst,
   return 0;
 }
 
+/* In-place set theoretic union: DST += SRC.  Returns negative on
+   error, positive if the DST changed or zero otherwise.  */
+int
+ulib_bitset_union_inplace_chg (ulib_bitset *restrict dst,
+                               const ulib_bitset *restrict src)
+{
+  unsigned int i, mn, mx;
+  bitset_elt *restrict d;
+  const bitset_elt *restrict s;
+  bitset_elt chg, tmp;
+
+  if ((mx = max_uint (dst->used_len, src->used_len)) == 0)
+    return 0;
+
+  if (ulib_vector_set_size (&dst->bits, mx) < 0)
+    return -1;
+
+  mn = min_uint (dst->used_len, src->used_len);
+
+  d = ulib_vector_front (&dst->bits);
+  s = ulib_vector_front (&src->bits);
+  for (i = 0, chg = 0; i < mn; ++i)
+    {
+      tmp = *d | *s++;
+      chg |= *d ^ tmp;
+      *d++ = tmp;
+    }
+
+  if (i < src->used_len)
+    {
+      chg = 1;
+      for (; i < mx; ++i)
+        *d++ = *s++;
+    }
+  dst->used_len = mx;
+
+  return !!chg;
+}
+
+
 /* Set theoretic intersection: DST = SRC1 * SRC2.  */
 int
 ulib_bitset_intersection (ulib_bitset *restrict dst,
@@ -369,6 +411,55 @@ ulib_bitset_intersection_inplace (ulib_bitset *restrict dst,
   return 0;
 }
 
+/* In-place set theoretic intersection: DST *= SRC.  Returns negative
+   on error, positive if the DST changed or zero otherwise. */
+int
+ulib_bitset_intersection_inplace_chg (ulib_bitset *restrict dst,
+                                      const ulib_bitset *restrict src)
+{
+  unsigned int i, mn;
+  bitset_elt *restrict d;
+  const bitset_elt *restrict s;
+  bitset_elt chg, tmp;
+
+  mn = min_uint (dst->used_len, src->used_len);
+
+  if (ulib_vector_set_size (&dst->bits, mn) < 0)
+    return -1;
+  if (mn == 0)
+    {
+      if (dst->used_len == 0)
+        return 0;
+      else
+        {
+          dst->used_len = mn;
+          return 1;
+        }
+    }
+
+  d = ulib_vector_front (&dst->bits);
+  s = ulib_vector_front (&src->bits);
+
+  for (i = 0, chg = 0; i < mn; ++i)
+    {
+      tmp = *d & *s++;
+      chg |= *d ^ tmp;
+      *d++ = tmp;
+    }
+
+  if (mn < dst->used_len)
+    {
+      chg = 1;
+      dst->used_len = mn;
+    }
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
+
+  return !!chg;
+}
+
+
 /* Set theoretic difference: DST = SRC1 - SRC2.  */
 int
 ulib_bitset_difference (ulib_bitset *restrict dst,
@@ -422,10 +513,45 @@ ulib_bitset_difference_inplace (ulib_bitset *restrict dst,
   for (i = 0; i < mn; ++i)
     *d++ &= ~ *s++;
 
+  d += dst->used_len - mn;
+
   if (d [-1] == 0)
     dst->used_len = used_len (dst);
 
   return 0;
+}
+
+/* In-place set theoretic difference: DST -= SRC.  Returns negative on
+   error, positive if the DST changed or zero otherwise.  */
+int
+ulib_bitset_difference_inplace_chg (ulib_bitset *restrict dst,
+                                    const ulib_bitset *restrict src)
+{
+  unsigned int i, mn;
+  bitset_elt *restrict d;
+  const bitset_elt *restrict s;
+  bitset_elt tmp, chg;
+
+  mn = min_uint (dst->used_len, src->used_len);
+  if (mn == 0)
+    return 0;
+
+  d = ulib_vector_front (&dst->bits);
+  s = ulib_vector_front (&src->bits);
+
+  for (i = 0, chg = 0; i < mn; ++i)
+    {
+      tmp = *d & ~ *s++;
+      chg |= *d ^ tmp;
+      *d++ = tmp;
+    }
+
+  d += dst->used_len - mn;
+
+  if (d [-1] == 0)
+    dst->used_len = used_len (dst);
+
+  return !!chg;
 }
 
 /* Return one plus the index of the last bit set.  */
@@ -446,7 +572,7 @@ ulib_bitset_max (const ulib_bitset *set)
 /* Check whether set A is a subset of set B.  */
 int
 ulib_bitset_is_subset (const ulib_bitset *restrict a,
-                    const ulib_bitset *restrict b)
+                       const ulib_bitset *restrict b)
 {
   unsigned int n;
   const bitset_elt *elt_a, *elt_b;

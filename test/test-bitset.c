@@ -335,11 +335,48 @@ test_bitset_union_inplace ()
       assert (check_union (set [d], set [d], set [s]) == 0);
     }
 }
+
+static void
+test_bitset_union_inplace_chg ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2, b;
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || s1 == s2);
+
+      b = ulib_rand (0, BITS_MAX - 1);
+      ulib_bitset_clear (set [s1], b);
+      ulib_bitset_clear (set [s2], b);
+
+      sts = ulib_bitset_union (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_union_inplace_chg (set [d], set [s1]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_union_inplace_chg (set [d], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_set (set [s1], b);
+      assert (sts == 0);
+
+      sts = ulib_bitset_union_inplace_chg (set [d], set [s1]);
+      assert (sts > 0);
+    }
+}
 
 
 /* Test intersection operation.  */
 static void
-test_bitset_intersection()
+test_bitset_intersection ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2;
@@ -380,6 +417,43 @@ test_bitset_intersection_inplace ()
       assert (sts == 0);
 
       assert (check_intersection (set [d], set [d], set [s]) == 0);
+    }
+}
+
+static void
+test_bitset_intersection_inplace_chg ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2, b;
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || s1 == s2);
+
+      b = ulib_rand (0, BITS_MAX - 1);
+        
+      ulib_bitset_set (set [s1], b);
+      ulib_bitset_set (set [s2], b);
+
+      sts = ulib_bitset_intersection (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s1]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s2]);
+      assert (sts == 0);
+
+      ulib_bitset_clear (set [s1], b);
+
+      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s1]);
+      assert (sts > 0);
     }
 }
 
@@ -429,6 +503,41 @@ test_bitset_difference_inplace ()
       assert (check_difference (set [d], set [d], set [s]) == 0);
     }
 }
+
+static void
+test_bitset_difference_inplace_chg ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2, b;
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || s1 == s2);
+
+      b = ulib_rand (0, BITS_MAX - 1);
+      sts = ulib_bitset_set (set [s1], b);
+      assert (sts == 0);
+      ulib_bitset_clear (set [s2], b);
+
+      sts = ulib_bitset_difference (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_difference_inplace_chg (set [d], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_set (set [s2], b);
+      assert (sts == 0);
+
+      sts = ulib_bitset_difference_inplace_chg (set [d], set [s2]);
+      assert (sts > 0);
+    }
+}
 
 
 /* Test subset operation.  */
@@ -469,7 +578,7 @@ test_bitset_subset ()
 }
 
 
-/* Compute timestamp difference. Result in microsseconds.  */
+/* Compute timestamp difference. Result in microseconds.  */
 static double
 diffts (const ulib_time *begin, const ulib_time *end)
 {
@@ -521,6 +630,13 @@ main ()
 
   init_sets ();
   ulib_gettime (&ts1);
+  test_bitset_union_inplace_chg ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("union[in-place, chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
   test_bitset_intersection ();
   ulib_gettime (&ts2);
   destroy_sets ();
@@ -535,6 +651,13 @@ main ()
 
   init_sets ();
   ulib_gettime (&ts1);
+  test_bitset_intersection_inplace_chg ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("intersection[in-place,chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
   test_bitset_difference ();
   ulib_gettime (&ts2);
   destroy_sets ();
@@ -546,6 +669,13 @@ main ()
   ulib_gettime (&ts2);
   destroy_sets ();
   printf ("difference[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_difference_inplace_chg ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("difference[in-place,chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
