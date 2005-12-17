@@ -142,6 +142,46 @@ ulib_bitset_set (ulib_bitset *set, unsigned int n)
   return 0;
 }
 
+/* Set each bit, whose index is in the array IDX of length N.  */
+int
+ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
+                      const unsigned int *idx)
+{
+  unsigned int i, mx, mx_idx;
+  bitset_elt *elt;
+
+  if (n == 0)
+    return 0;
+
+  /* Get the max index.  */
+  mx = 0;
+  for (i = 0; i < n; ++i)
+    if (mx < idx [i])
+      mx = idx [i];
+
+  /* Ensure the bitset is big enough.  */
+  mx_idx = elt_index (mx);
+  if (ulib_vector_atleast (&set->bits, mx_idx + 1) < 0)
+    return -1;
+
+  /* Check if we need to increase used elements count and clear the
+     new elements.  */
+  elt = ulib_vector_front (&set->bits);
+  if (set->used_len < mx_idx + 1)
+    {
+      memset (elt + set->used_len, 0,
+              (mx_idx - set->used_len + 1) * sizeof (bitset_elt));
+      set->used_len = mx_idx + 1;
+    }
+
+  /* Set bits.  */
+  for (i = 0; i < n; ++i)
+    elt [elt_index (idx [i])] |= 1U << bit_index (idx [i]);
+
+  return 0;
+}
+
+
 /* Clear bit N in the bitset SET.  */
 void
 ulib_bitset_clear (ulib_bitset *set, unsigned int n)
@@ -160,9 +200,31 @@ ulib_bitset_clear (ulib_bitset *set, unsigned int n)
     }
 }
 
+/* Clear each bit, whose index is in the array IDX of length N.  */
+void
+ulib_bitset_clear_bits (ulib_bitset *set, unsigned int n,
+                        const unsigned int *idx)
+{
+  unsigned int i;
+  bitset_elt *elt;
+
+  if (set->used_len == 0)
+    return;
+
+  elt = ulib_vector_front (&set->bits);
+  for (i = 0; i < n; ++i)
+    {
+      if (elt_index (idx [i]) < set->used_len)
+        elt [elt_index (idx [i])] &= ~(1U << bit_index (idx [i]));
+    }
+  
+  if (elt [set->used_len - 1] == 0)
+    set->used_len = used_len (set);
+}
+
 /* Check whether bit N in the set SET is non-zero.  */
 int
-ulib_bitset_isset (const ulib_bitset *set, unsigned int n)
+ulib_bitset_is_set (const ulib_bitset *set, unsigned int n)
 {
   unsigned int idx = elt_index (n);
 
@@ -379,6 +441,35 @@ ulib_bitset_max (const ulib_bitset *set)
   return ((set->used_len - 1) * sizeof (bitset_elt) * CHAR_BIT
           + bitset_elt_ffs (*elt)
           + 1);
+}
+
+/* Check whether set A is a subset of set B.  */
+int
+ulib_bitset_is_subset (const ulib_bitset *restrict a,
+                    const ulib_bitset *restrict b)
+{
+  unsigned int n;
+  const bitset_elt *elt_a, *elt_b;
+
+  if (a->used_len == 0 || a->used_len < b->used_len)
+    return 1;
+
+  if (b->used_len == 0 || b->used_len < a->used_len)
+    return 0;
+
+  n = a->used_len;
+  elt_a = ulib_vector_front (&a->bits);
+  elt_b = ulib_vector_front (&b->bits);
+  while (n--)
+    {
+      if (*elt_a != *elt_b && (*elt_b & ~ *elt_a) == 0)
+        return 0;
+
+      ++elt_a;
+      ++elt_b;
+    }
+
+  return 1;
 }
 
 /*

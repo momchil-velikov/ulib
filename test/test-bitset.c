@@ -58,17 +58,17 @@ check_union (const ulib_bitset *dst, const ulib_bitset *src1,
 
   /* Check whether each bit in SRC1 or SRC2 in present in DST.  */
   for (i = 0; i < n; ++i)
-    if ((ulib_bitset_isset (src1, i) != 0
-         || ulib_bitset_isset (src2, i) != 0)
-        && ulib_bitset_isset (dst, i) == 0)
+    if ((ulib_bitset_is_set (src1, i) != 0
+         || ulib_bitset_is_set (src2, i) != 0)
+        && ulib_bitset_is_set (dst, i) == 0)
       return -1;
 
   /* Check whether each bit in DST is present in SRC1 or SRC2.  */
   n = ulib_bitset_max (dst);
   for (i = 0; i < n; ++i)
-    if (ulib_bitset_isset (dst, i) != 0
-        && ulib_bitset_isset (src1, i) == 0
-        && ulib_bitset_isset (src2, i) == 0)
+    if (ulib_bitset_is_set (dst, i) != 0
+        && ulib_bitset_is_set (src1, i) == 0
+        && ulib_bitset_is_set (src2, i) == 0)
       return -1;
 
   return 0;
@@ -89,17 +89,17 @@ check_intersection (const ulib_bitset *dst, const ulib_bitset *src1,
   /* Check whether a bit, set in both SRC1 and SRC2, is set in DST
      too.  */
   for (i = 0; i < n; ++i)
-    if (ulib_bitset_isset (src1, i) != 0
-        && ulib_bitset_isset (src2, i) != 0
-        && ulib_bitset_isset (dst, i) == 0)
+    if (ulib_bitset_is_set (src1, i) != 0
+        && ulib_bitset_is_set (src2, i) != 0
+        && ulib_bitset_is_set (dst, i) == 0)
       return -1;
 
   /* Check whether a bit, set in DST, is set in SRC1 and SRC2 too.  */
   n = ulib_bitset_max (dst);
   for (i = 0; i < n; ++i)
-    if (ulib_bitset_isset (dst, i) != 0
-        && (ulib_bitset_isset (src1, i) == 0
-            || ulib_bitset_isset (src2, i) == 0))
+    if (ulib_bitset_is_set (dst, i) != 0
+        && (ulib_bitset_is_set (src1, i) == 0
+            || ulib_bitset_is_set (src2, i) == 0))
       return -1;
 
   return 0;
@@ -119,17 +119,40 @@ check_difference (const ulib_bitset *dst, const ulib_bitset *src1,
 
   /* Check whether each bit in SRC2 is not present in DST.  */
   for (i = 0; i < n; ++i)
-    if (ulib_bitset_isset (src2, i) != 0
-        && ulib_bitset_isset (dst, i) != 0)
+    if (ulib_bitset_is_set (src2, i) != 0
+        && ulib_bitset_is_set (dst, i) != 0)
       return -1;
 
   /* Check whether each bit in DST is set in SRC1 and clear in
      SRC2.  */
   n = ulib_bitset_max (dst);
   for (i = 0; i < n; ++i)
-    if (ulib_bitset_isset (dst, i) != 0
-        && (ulib_bitset_isset (src1, i) == 0
-            || ulib_bitset_isset (src2, i) != 0))
+    if (ulib_bitset_is_set (dst, i) != 0
+        && (ulib_bitset_is_set (src1, i) == 0
+            || ulib_bitset_is_set (src2, i) != 0))
+      return -1;
+
+  return 0;
+}
+
+/* Check whether all bits with indices in IDX are 1 in SET.  */
+static int
+check_bits_set (const ulib_bitset *set, unsigned int n, const unsigned int *idx)
+{
+  while (n--)
+    if (!ulib_bitset_is_set (set, idx [n]))
+      return -1;
+
+  return 0;
+}
+
+/* Check whether all bits with indices in IDX are 0 in SET.  */
+static int
+check_bits_clear (const ulib_bitset *set, unsigned int n,
+                  const unsigned int *idx)
+{
+  while (n--)
+    if (ulib_bitset_is_set (set, idx [n]))
       return -1;
 
   return 0;
@@ -158,6 +181,114 @@ destroy_sets ()
     }
 }
 
+
+/* Test setting many bits: one by one.  */
+static void
+test_bitset_set_one_by_one ()
+{
+  unsigned int i, j, sts;
+  unsigned int *idx;
+  ulib_bitset set;
+
+  for (i = 0; i < NLOOPS / 100; ++i)
+    {
+      sts = ulib_bitset_init (&set);
+      assert (sts == 0);
+
+      idx = malloc (BITS_PER_SET * sizeof (unsigned int));
+      assert (idx);
+
+      for (j = 0; j < BITS_PER_SET; ++j)
+        {
+          idx [j] = ulib_rand (0, BITS_MAX - 1);
+          sts = ulib_bitset_set (&set, idx [j]);
+          assert (sts == 0);
+        }
+
+      assert (check_bits_set (&set, BITS_PER_SET, idx) == 0);
+      ulib_bitset_destroy (&set);
+      free (idx);
+    }
+}
+
+/* Test setting many bits: at once.  */
+static void
+test_bitset_set_at_once ()
+{
+  unsigned int i, j, sts;
+  unsigned int *idx;
+  ulib_bitset set;
+
+  for (i = 0; i < NLOOPS / 100; ++i)
+    {
+
+      sts = ulib_bitset_init (&set);
+      assert (sts == 0);
+
+      idx = malloc (BITS_PER_SET * sizeof (unsigned int));
+      assert (idx);
+
+      for (j = 0; j < BITS_PER_SET; ++j)
+        idx [j] = ulib_rand (0, BITS_MAX - 1);
+      
+      sts = ulib_bitset_set_bits (&set, BITS_PER_SET, idx);
+      assert (sts == 0);
+
+      assert (check_bits_set (&set, BITS_PER_SET, idx) == 0);
+      ulib_bitset_destroy (&set);
+      free (idx);
+    }
+}
+
+/* Test clearing many bits: one by one.  */
+static void
+test_bitset_clear_one_by_one ()
+{
+  unsigned int i, j, d;
+  unsigned int *idx;
+
+  for (i = 0; i < NLOOPS / 100; ++i)
+    {
+      d = ulib_rand (0, NSETS_MAX - 1);
+
+      idx = malloc (BITS_PER_SET * sizeof (unsigned int));
+      assert (idx);
+
+      for (j = 0; j < BITS_PER_SET; ++j)
+        {
+          idx [j] = ulib_rand (0, BITS_MAX - 1);
+          ulib_bitset_clear (set [d], idx [j]);
+        }
+
+      assert (check_bits_clear (set [d], BITS_PER_SET, idx) == 0);
+      free (idx);
+    }
+}
+
+/* Test clearing many bits: at once.  */
+static void
+test_bitset_clear_at_once ()
+{
+  unsigned int i, j, d;
+  unsigned int *idx;
+
+  for (i = 0; i < NLOOPS / 100; ++i)
+    {
+      d = ulib_rand (0, NSETS_MAX - 1);
+
+      idx = malloc (BITS_PER_SET * sizeof (unsigned int));
+      assert (idx);
+
+      for (j = 0; j < BITS_PER_SET; ++j)
+        idx [j] = ulib_rand (0, BITS_MAX - 1);
+
+      
+      ulib_bitset_clear_bits (set [d], BITS_PER_SET, idx);
+
+      assert (check_bits_clear (set [d], BITS_PER_SET, idx) == 0);
+      free (idx);
+    }
+}
 
 /* Test union operation.  */
 static void
@@ -300,6 +431,44 @@ test_bitset_difference_inplace ()
 }
 
 
+/* Test subset operation.  */
+static void
+test_bitset_subset ()
+{
+  volatile int sts;
+  unsigned int i, s1, s2;
+  ulib_bitset *dst = set [0];
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          s1 = ulib_rand (1, NSETS_MAX - 1);
+          s2 = ulib_rand (1, NSETS_MAX - 1);
+        }
+      while (s1 == s2);
+
+      sts = ulib_bitset_union (dst, set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_is_subset (set [s1], dst);
+      assert (sts != 0);
+
+      sts = ulib_bitset_is_subset (set [s2], dst);
+      assert (sts != 0);
+
+      sts = ulib_bitset_intersection (dst, set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_is_subset (dst, set [s1]);
+      assert (sts != 0);
+
+      sts = ulib_bitset_is_subset (dst, set [s2]);
+      assert (sts != 0);
+    }
+}
+
+
 /* Compute timestamp difference. Result in microsseconds.  */
 static double
 diffts (const ulib_time *begin, const ulib_time *end)
@@ -311,6 +480,30 @@ int
 main ()
 {
   ulib_time ts1, ts2;
+
+  ulib_gettime (&ts1);
+  test_bitset_set_one_by_one ();
+  ulib_gettime (&ts2);
+  printf ("set[one by one]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  ulib_gettime (&ts1);
+  test_bitset_set_at_once ();
+  ulib_gettime (&ts2);
+  printf ("set[at once]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_clear_one_by_one ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("clear[one by one]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_clear_at_once ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("clear[at once]: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
@@ -353,6 +546,13 @@ main ()
   ulib_gettime (&ts2);
   destroy_sets ();
   printf ("difference[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_subset ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("subset: %f s\n", diffts (&ts1, &ts2) / 1e6);
   
   return 0;
 }
