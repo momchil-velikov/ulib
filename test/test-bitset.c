@@ -292,7 +292,7 @@ test_bitset_clear_at_once ()
 
 /* Test union operation.  */
 static void
-test_bitset_union ()
+test_bitset_or ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2;
@@ -307,7 +307,7 @@ test_bitset_union ()
         }
       while (d == s1 || d == s2 || s1 == s2);
 
-      sts = ulib_bitset_union (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_or (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
       assert (check_union (set [d], set [s1], set [s2]) == 0);
@@ -315,7 +315,7 @@ test_bitset_union ()
 }
 
 static void
-test_bitset_union_inplace ()
+test_bitset_destr_or ()
 {
   volatile int sts;
   unsigned int i, d, s;
@@ -329,7 +329,7 @@ test_bitset_union_inplace ()
         }
       while (d == s);
 
-      sts = ulib_bitset_union_inplace (set [d], set [s]);
+      sts = ulib_bitset_destr_or (set [d], set [s]);
       assert (sts == 0);
 
       assert (check_union (set [d], set [d], set [s]) == 0);
@@ -337,7 +337,7 @@ test_bitset_union_inplace ()
 }
 
 static void
-test_bitset_union_inplace_chg ()
+test_bitset_destr_or_chg ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2, b;
@@ -356,19 +356,19 @@ test_bitset_union_inplace_chg ()
       ulib_bitset_clear (set [s1], b);
       ulib_bitset_clear (set [s2], b);
 
-      sts = ulib_bitset_union (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_or (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
-      sts = ulib_bitset_union_inplace_chg (set [d], set [s1]);
+      sts = ulib_bitset_destr_or_chg (set [d], set [s1]);
       assert (sts == 0);
 
-      sts = ulib_bitset_union_inplace_chg (set [d], set [s2]);
+      sts = ulib_bitset_destr_or_chg (set [d], set [s2]);
       assert (sts == 0);
 
       sts = ulib_bitset_set (set [s1], b);
       assert (sts == 0);
 
-      sts = ulib_bitset_union_inplace_chg (set [d], set [s1]);
+      sts = ulib_bitset_destr_or_chg (set [d], set [s1]);
       assert (sts > 0);
     }
 }
@@ -376,7 +376,7 @@ test_bitset_union_inplace_chg ()
 
 /* Test intersection operation.  */
 static void
-test_bitset_intersection ()
+test_bitset_and ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2;
@@ -391,7 +391,7 @@ test_bitset_intersection ()
         }
       while (d == s1 || d == s2 || s1 == s2);
 
-      sts = ulib_bitset_intersection (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_and (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
       assert (check_intersection (set [d], set [s1], set [s2]) == 0);
@@ -399,7 +399,7 @@ test_bitset_intersection ()
 }
 
 static void
-test_bitset_intersection_inplace ()
+test_bitset_destr_and ()
 {
   volatile int sts;
   unsigned int i, d, s;
@@ -413,7 +413,7 @@ test_bitset_intersection_inplace ()
         }
       while (d == s);
 
-      sts = ulib_bitset_intersection_inplace (set [d], set [s]);
+      sts = ulib_bitset_destr_and (set [d], set [s]);
       assert (sts == 0);
 
       assert (check_intersection (set [d], set [d], set [s]) == 0);
@@ -421,7 +421,7 @@ test_bitset_intersection_inplace ()
 }
 
 static void
-test_bitset_intersection_inplace_chg ()
+test_bitset_destr_and_chg ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2, b;
@@ -441,18 +441,18 @@ test_bitset_intersection_inplace_chg ()
       ulib_bitset_set (set [s1], b);
       ulib_bitset_set (set [s2], b);
 
-      sts = ulib_bitset_intersection (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_and (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
-      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s1]);
+      sts = ulib_bitset_destr_and_chg (set [d], set [s1]);
       assert (sts == 0);
 
-      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s2]);
+      sts = ulib_bitset_destr_and_chg (set [d], set [s2]);
       assert (sts == 0);
 
       ulib_bitset_clear (set [s1], b);
 
-      sts = ulib_bitset_intersection_inplace_chg (set [d], set [s1]);
+      sts = ulib_bitset_destr_and_chg (set [d], set [s1]);
       assert (sts > 0);
     }
 }
@@ -460,7 +460,7 @@ test_bitset_intersection_inplace_chg ()
 
 /* Test difference operation.  */
 static void
-test_bitset_difference ()
+test_bitset_andn ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2;
@@ -475,7 +475,7 @@ test_bitset_difference ()
         }
       while (d == s1 || d == s2 || s1 == s2);
 
-      sts = ulib_bitset_difference (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_andn (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
       assert (check_difference (set [d], set [s1], set [s2]) == 0);
@@ -483,7 +483,7 @@ test_bitset_difference ()
 }
 
 static void
-test_bitset_difference_inplace ()
+test_bitset_destr_andn ()
 {
   volatile int sts;
   unsigned int i, d, s;
@@ -497,7 +497,7 @@ test_bitset_difference_inplace ()
         }
       while (d == s);
 
-      sts = ulib_bitset_difference_inplace (set [d], set [s]);
+      sts = ulib_bitset_destr_andn (set [d], set [s]);
       assert (sts == 0);
 
       assert (check_difference (set [d], set [d], set [s]) == 0);
@@ -505,7 +505,7 @@ test_bitset_difference_inplace ()
 }
 
 static void
-test_bitset_difference_inplace_chg ()
+test_bitset_destr_andn_chg ()
 {
   volatile int sts;
   unsigned int i, d, s1, s2, b;
@@ -525,21 +525,142 @@ test_bitset_difference_inplace_chg ()
       assert (sts == 0);
       ulib_bitset_clear (set [s2], b);
 
-      sts = ulib_bitset_difference (set [d], set [s1], set [s2]);
+      sts = ulib_bitset_andn (set [d], set [s1], set [s2]);
       assert (sts == 0);
 
-      sts = ulib_bitset_difference_inplace_chg (set [d], set [s2]);
+      sts = ulib_bitset_destr_andn_chg (set [d], set [s2]);
       assert (sts == 0);
 
       sts = ulib_bitset_set (set [s2], b);
       assert (sts == 0);
 
-      sts = ulib_bitset_difference_inplace_chg (set [d], set [s2]);
+      sts = ulib_bitset_destr_andn_chg (set [d], set [s2]);
       assert (sts > 0);
     }
 }
 
 
+static void
+test_bitset_or_andn ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2, s3;
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+          s3 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || d == s3 || s1 == s2 || s1 == s3 || s2 == s3);
+
+      sts = ulib_bitset_or_andn (set [d], set [s1], set [s2], set [s3]);
+      assert (sts == 0);
+
+#ifndef NDEBUG
+      {
+        int sts;
+        unsigned int n = ulib_bitset_max (set [d]);
+
+        while (n--)
+          {
+            sts = (ulib_bitset_is_set (set [s1], n)
+                   || (ulib_bitset_is_set (set [s2], n)
+                       && !ulib_bitset_is_set (set [s3], n)));
+            assert ((sts == 0 && !ulib_bitset_is_set (set [d], n))
+                    || (sts != 0 && ulib_bitset_is_set (set [d], n)));
+          }
+      }
+#endif
+    }
+}
+
+static void
+test_bitset_destr_or_andn ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2;
+  ulib_bitset *d0 = set [0];
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || s1 == s2);
+
+      sts = ulib_bitset_copy (d0, set [d]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_destr_or_andn (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+#ifndef NDEBUG
+      {
+        int sts;
+        unsigned int n = ulib_bitset_max (set [d]);
+
+        while (n--)
+          {
+            sts = (ulib_bitset_is_set (d0, n)
+                   || (ulib_bitset_is_set (set [s1], n)
+                       && !ulib_bitset_is_set (set [s2], n)));
+            assert ((sts == 0 && !ulib_bitset_is_set (set [d], n))
+                    || (sts != 0 && ulib_bitset_is_set (set [d], n)));
+          }
+      }
+#endif
+    }
+}
+
+static void
+test_bitset_destr_or_andn_chg ()
+{
+  volatile int sts;
+  unsigned int i, d, s1, s2, b;
+
+  for (i = 0; i < NLOOPS; ++i)
+    {
+      do
+        {
+          d = ulib_rand (0, NSETS_MAX - 1);
+          s1 = ulib_rand (0, NSETS_MAX - 1);
+          s2 = ulib_rand (0, NSETS_MAX - 1);
+        }
+      while (d == s1 || d == s2 || s1 == s2);
+
+      b = ulib_rand (0, BITS_MAX);
+      ulib_bitset_clear (set [d], b);
+      ulib_bitset_clear (set [s1], b);
+      ulib_bitset_clear (set [s2], b);
+
+      sts = ulib_bitset_destr_or_andn (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      sts = ulib_bitset_destr_or_andn_chg (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      ulib_bitset_set (set [s1], b);
+      sts = ulib_bitset_destr_or_andn_chg (set [d], set [s1], set [s2]);
+      assert (sts > 0);
+
+      ulib_bitset_set (set [s2], b);
+      sts = ulib_bitset_destr_or_andn_chg (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+
+      ulib_bitset_clear (set [d], b);
+      sts = ulib_bitset_destr_or_andn_chg (set [d], set [s1], set [s2]);
+      assert (sts == 0);
+    }
+}
+
+
 /* Test subset operation.  */
 static void
 test_bitset_subset ()
@@ -557,7 +678,7 @@ test_bitset_subset ()
         }
       while (s1 == s2);
 
-      sts = ulib_bitset_union (dst, set [s1], set [s2]);
+      sts = ulib_bitset_or (dst, set [s1], set [s2]);
       assert (sts == 0);
 
       sts = ulib_bitset_is_subset (set [s1], dst);
@@ -566,7 +687,7 @@ test_bitset_subset ()
       sts = ulib_bitset_is_subset (set [s2], dst);
       assert (sts != 0);
 
-      sts = ulib_bitset_intersection (dst, set [s1], set [s2]);
+      sts = ulib_bitset_and (dst, set [s1], set [s2]);
       assert (sts == 0);
 
       sts = ulib_bitset_is_subset (dst, set [s1]);
@@ -616,66 +737,87 @@ main ()
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_union ();
+  test_bitset_or ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("union: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("or: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_union_inplace ();
+  test_bitset_destr_or ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("union[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_or: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_union_inplace_chg ();
+  test_bitset_destr_or_chg ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("union[in-place, chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_or_chg: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_intersection ();
+  test_bitset_and ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("intersection: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("and: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_intersection_inplace ();
+  test_bitset_destr_and ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("intersection[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_and: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_intersection_inplace_chg ();
+  test_bitset_destr_and_chg ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("intersection[in-place,chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_and_chg: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_difference ();
+  test_bitset_andn ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("difference: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("andn: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_difference_inplace ();
+  test_bitset_destr_andn ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("difference[in-place]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_andn: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
-  test_bitset_difference_inplace_chg ();
+  test_bitset_destr_andn_chg ();
   ulib_gettime (&ts2);
   destroy_sets ();
-  printf ("difference[in-place,chg]: %f s\n", diffts (&ts1, &ts2) / 1e6);
+  printf ("destr_andn_chg: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_or_andn ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("or_andn: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_destr_or_andn ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("destr_or_andn: %f s\n", diffts (&ts1, &ts2) / 1e6);
+
+  init_sets ();
+  ulib_gettime (&ts1);
+  test_bitset_destr_or_andn_chg ();
+  ulib_gettime (&ts2);
+  destroy_sets ();
+  printf ("destr_or_andn_chg: %f s\n", diffts (&ts1, &ts2) / 1e6);
 
   init_sets ();
   ulib_gettime (&ts1);
