@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "list.h"
+#include "ulib-if.h"
 
 BEGIN_DECLS
 
@@ -33,26 +34,27 @@ struct ulib_hash
 typedef struct ulib_hash ulib_hash;
 
 /* Initialize a hash table.  */
-int ulib_hash_init (ulib_hash *, unsigned int,
-		    ulib_hash_func, ulib_hashcmp_func);
+ULIB_IF int ulib_hash_init (ulib_hash *, unsigned int,
+                            ulib_hash_func, ulib_hashcmp_func);
 
 /* Destroy a hash table.  */
-void ulib_hash_destroy (ulib_hash *);
+ULIB_IF void ulib_hash_destroy (ulib_hash *);
 
 /* Search into the hash table.  */
-ulib_list *ulib_hash_lookup (const ulib_hash *, const ulib_list *);
+ULIB_IF ulib_list *ulib_hash_lookup (const ulib_hash *, const ulib_list *);
 
 /* Insert into the hash table.  */
-void ulib_hash_insert (ulib_hash *, ulib_list *);
+ULIB_IF void ulib_hash_insert (ulib_hash *, ulib_list *);
 
 /* Visit each element of the hash table.  Invoke the function VISIT
    with the first parameter being the element and the second being the
    user data DATA.  */
-void ulib_hash_traverse (ulib_hash *, ulib_visit_func visit, void *data);
+ULIB_IF void ulib_hash_traverse (ulib_hash *, ulib_visit_func visit,
+                                 void *data);
 
 /* Good string hash functions.  */
-unsigned int ulib_strhash (const char *);
-unsigned int ulib_strnhash (const char *, unsigned int);
+ULIB_IF unsigned int ulib_strhash (const char *);
+ULIB_IF unsigned int ulib_strnhash (const char *, unsigned int);
 
 END_DECLS
 

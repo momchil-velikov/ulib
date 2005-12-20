@@ -2,7 +2,8 @@
 #define ulib__vector_h 1
 
 #include "defs.h"
-#include "assert.h"
+#include "ulib-if.h"
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -52,7 +53,7 @@ typedef struct ulib_vector ulib_vector;
 
 /* Initialize a vector.  On error sets errno and returns a negative
    value.  */
-int ulib_vector_init (ulib_vector *, ...);
+ULIB_IF int ulib_vector_init (ulib_vector *, ...);
 
 /* Destroy a vector.  */
 static inline void
@@ -69,10 +70,10 @@ ulib_vector_length (const ulib_vector *v)
 }
 
 /* Set the number of elements in the vector.  */
-int ulib_vector_set_size (ulib_vector *, unsigned int);
+ULIB_IF int ulib_vector_set_size (ulib_vector *, unsigned int);
 
 /* Ensure vector V has at least N elements.  */
-int ulib_vector_atleast (ulib_vector *v, unsigned int n);
+ULIB_IF int ulib_vector_atleast (ulib_vector *v, unsigned int n);
 
 /* Change the number of elements in the vector by adding signed N to
    the current size.  */
@@ -83,7 +84,7 @@ ulib_vector_resize (ulib_vector *v, int n)
 }
 
 /* Preallocate space in the vector.  */
-int ulib_vector_reserve (ulib_vector *, unsigned int);
+ULIB_IF int ulib_vector_reserve (ulib_vector *, unsigned int);
 
 /* Empty a vector.  */
 static inline void
@@ -98,7 +99,7 @@ ulib_vector_clear (ulib_vector *v, int release)
 }
 
 /* Set a vector element.  */
-int ulib_vector_set (ulib_vector *, unsigned int, const void *);
+ULIB_IF int ulib_vector_set (ulib_vector *, unsigned int, const void *);
 
 /* Get a pointer to a vector element.  */
 static inline void *
@@ -123,7 +124,7 @@ ulib_vector_back (const ulib_vector *v)
 }
 
 /* Set a data pointer element.  */
-int ulib_vector_set_ptr (ulib_vector *, unsigned int, void *);
+ULIB_IF int ulib_vector_set_ptr (ulib_vector *, unsigned int, void *);
 
 /* Get the value of a data pointer element.  */
 static inline void *
@@ -134,7 +135,7 @@ ulib_vector_ptr_elt (const ulib_vector *v, unsigned int idx)
 }
 
 /* Set a function pointer element.  */
-int ulib_vector_set_func (ulib_vector *, unsigned int, ulib_func);
+ULIB_IF int ulib_vector_set_func (ulib_vector *, unsigned int, ulib_func);
 
 /* Get the value of a function pointer element.  */
 static inline ulib_func
@@ -166,7 +167,7 @@ ulib_vector_append_func (ulib_vector *v, ulib_func func)
 }
 
 /* private */
-int ulib__vector_moveup (ulib_vector *v, unsigned int idx);
+ULIB_IF int ulib__vector_moveup (ulib_vector *v, unsigned int idx);
 
 /* Insert an element into the vector before position IDX.  */
 static inline int
@@ -202,7 +203,7 @@ ulib_vector_insert_func (ulib_vector *v, unsigned int idx, ulib_func func)
 }
 
 /* Remove the element at IDX from the vector.  */
-void ulib_vector_remove (ulib_vector *v, unsigned int idx);
+ULIB_IF void ulib_vector_remove (ulib_vector *v, unsigned int idx);
 
 /* Remove the last element in the vector.  */
 static inline void
@@ -214,7 +215,7 @@ ulib_vector_remove_last (ulib_vector *v)
 
 /* Copy a vector.  Both vectors must be initialized with compatible
    parameters. */
-int ulib_vector_copy (ulib_vector *dst, const ulib_vector *src);
+ULIB_IF int ulib_vector_copy (ulib_vector *dst, const ulib_vector *src);
 
 END_DECLS
 #endif /* ulib__vector_h */

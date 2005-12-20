@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "list.h"
+#include "ulib-if.h"
 
 BEGIN_DECLS
 
@@ -41,36 +42,36 @@ typedef struct ulib_cache ulib_cache;
 #define ULIB_CACHE_GCSCAN 7
 
 /* Create an object cache.  Throws NO_MEMORY, INVALID_PARAMETER.  */
-ulib_cache *ulib_cache_create (int, ...);
+ULIB_IF ulib_cache *ulib_cache_create (int, ...);
 
 /* Allocate an object from a cache.  Throws NO_MEMORY.  */
-void *ulib_cache_alloc (ulib_cache *);
+ULIB_IF void *ulib_cache_alloc (ulib_cache *);
 
 /* Release an object to the cache.  */
-void ulib_cache_free (ulib_cache *, void *);
+ULIB_IF void ulib_cache_free (ulib_cache *, void *);
 
 /* Release cached objects.  */
-void ulib_cache_flush (ulib_cache *);
+ULIB_IF void ulib_cache_flush (ulib_cache *);
 
 /* Register a non-cached root object.  */
-int ulib_gcroot (void *, ulib_gcscan_func);
+ULIB_IF int ulib_gcroot (void *, ulib_gcscan_func);
 
 /* Register a cached root object.  */
-int ulib_gcroot_cached (void *);
+ULIB_IF int ulib_gcroot_cached (void *);
 
 /* Unregister a root object.  */
-void ulib_gcunroot (void *);
+ULIB_IF void ulib_gcunroot (void *);
 
 /* Push an allocation frame.  Objects, allocated in previous frames,
    won't be collected during the lifetime of this frame.  */
-void ulib_gcpush (void);
+ULIB_IF void ulib_gcpush (void);
 
 /* Pop an allocation frame.  Live objects of the popped frame will be
    merged into the old frame.  */
-void ulib_gcpop (void);
+ULIB_IF void ulib_gcpop (void);
 
 /* Perform garbage collection.  */
-void ulib_gcrun (void);
+ULIB_IF void ulib_gcrun (void);
 
 END_DECLS
 

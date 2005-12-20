@@ -2,6 +2,7 @@
 #define ulib__time_h 1
 
 #include "defs.h"
+#include "ulib-if.h"
 
 BEGIN_DECLS
 
@@ -17,7 +18,7 @@ struct ulib_time
 typedef struct ulib_time ulib_time;
 
 /* Get current time.  */
-void ulib_gettime (ulib_time *);
+ULIB_IF void ulib_gettime (ulib_time *);
 
 END_DECLS
 #endif /* ulib__time_h */

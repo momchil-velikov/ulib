@@ -2,6 +2,7 @@
 #define ulib__utf8_h 1
 
 #include "defs.h"
+#include "ulib-if.h"
 #include <wchar.h>
 #include <stddef.h>
 
@@ -10,33 +11,33 @@ BEGIN_DECLS
 /* Return the number of bytes that make up the multibyte character
    beginning at STRING and extending at most N bytes. Return -1 if
    next N or fewer bytes do not for a valid UTF-8 character.  */
-int utf8_mblen (const char *string, size_t n);
+ULIB_IF int utf8_mblen (const char *string, size_t n);
 
 /* Return the number of bytes needed to encode in UTF-8 the wide
    character WC.  */
-size_t utf8_wclen (wchar_t wc);
+ULIB_IF size_t utf8_wclen (wchar_t wc);
 
 /* Convert the first multibyte character beginning at STRING to its
    corresponding wide character code and store the result in *RESULT.
    Return the number of bytes converted or -1 for an invalid byte
    sequence.  The function never examines more than N bytes.  */
-int utf8_mbtowc (wchar_t *result, const char *string, size_t n);
+ULIB_IF int utf8_mbtowc (wchar_t *result, const char *string, size_t n);
 
 /* Convert the wide character code WC to its corresponding multibyte
    character sequence and store the result in bytes starting at
    STRING.  Return the number of bytes stored.  Return -1 if the
    number of bytes needed to encode WC is greater than N.  */
-int utf8_wctomb (char *string, size_t len, wchar_t wc);
+ULIB_IF int utf8_wctomb (char *string, size_t len, wchar_t wc);
 
 /* Return the number of wide characters, which would result after the
    conversion of the multibyte character string STRING, examining at
    most N bytes.  Return -1 if the string contains an invalid or
    partial character sequence.  */
-int utf8_mbslen (const char *string, size_t n);
+ULIB_IF int utf8_mbslen (const char *string, size_t n);
 
 /* Return the number of bytes, which would result after the conversion
    of the wide character string WSTRING.  */
-size_t utf8_wcslen (const wchar_t *wstring);
+ULIB_IF size_t utf8_wcslen (const wchar_t *wstring);
 
 /* Convert the multibyte character array STRING of length *N to an
    array of wide character codes beginning at WSTRING of maximum
@@ -46,8 +47,8 @@ size_t utf8_wcslen (const wchar_t *wstring);
    conversion stops if the output buffer is filled, after converting
    the entire input buffer or when the remaining multibyte characters
    do not form a valid multibyte character sequence.  */
-size_t utf8_mbstowcs (wchar_t *wstring, size_t *size,
-		      const char *string, size_t *n);
+ULIB_IF size_t utf8_mbstowcs (wchar_t *wstring, size_t *size,
+                              const char *string, size_t *n);
 
 /* Convert the wide character array WSTRING of length *SIZE to a
    multibyte character array beginning at STRING of maximum length *N.
@@ -56,8 +57,8 @@ size_t utf8_mbstowcs (wchar_t *wstring, size_t *size,
    multibyte character array, the same as *N.  The conversion stops if
    the output buffer is filled or after converting the entire input
    buffer.  */
-size_t utf8_wcstombs (char *string, size_t *n,
-		      const wchar_t *wstring, size_t *size);
+ULIB_IF size_t utf8_wcstombs (char *string, size_t *n,
+                              const wchar_t *wstring, size_t *size);
 
 END_DECLS
 

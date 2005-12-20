@@ -14,6 +14,7 @@ ulib_hdrs = ['avl-tree.h', 'avl-tree.c', 'cache.h', 'defs.h',
 # Arrange the library objects to be compiled to Position Independent
 # Code.
 smk.env.cc.pic = True
+smk.env.cc.define('ULIB_SO')
 
 # Build the library.  
 libulib = smk.make_shared_lib ('ulib', srcs = ulib_srcs)

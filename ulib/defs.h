@@ -18,6 +18,20 @@
 #define __attribute__(x)
 #endif
 
+#ifdef __GNUC__
+# define ULIB_EXPORT __attribute__ ((visibility("default")))
+# define ULIB_IMPORT
+# define ULIB_INTERNAL __attribute__ ((visibility("internal")))
+#elif defined (_MSC_VER)
+# define ULIB_EXPORT __declspec (dllexport)
+# define ULIB_IMPORT __declspec (dllimport)
+# define ULIB_INTERNAL
+#else
+# define ULIB_EXPORT
+# define ULIB_IMPORT
+# define ULIB_INTERNAL
+#endif
+
 #ifndef BEGIN_DECLS
 # ifdef __cplusplus
 #  define BEGIN_DECLS extern "C" {

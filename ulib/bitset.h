@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "vector.h"
+#include "ulib-if.h"
 
 BEGIN_DECLS
 
@@ -17,28 +18,28 @@ struct ulib_bitset
 typedef struct ulib_bitset ulib_bitset;
 
 /* Initialize an empty bit set.  */
-int ulib_bitset_init (ulib_bitset *set);
+ULIB_IF int ulib_bitset_init (ulib_bitset *set);
 
 /* Destroy a bit set.  */
-void ulib_bitset_destroy (ulib_bitset *set);
+ULIB_IF void ulib_bitset_destroy (ulib_bitset *set);
 
 /* Set each bit, whose index is in the array IDX of length N.  */
-int ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
-                          const unsigned int *idx);
+ULIB_IF int ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
+                                  const unsigned int *idx);
 
 /* Set bit N in the bitset SET.  */
-int ulib_bitset_set (ulib_bitset *set, unsigned int n);
+ULIB_IF int ulib_bitset_set (ulib_bitset *set, unsigned int n);
 
 /* Set each bit, whose index is in the array IDX of length N.  */
-int ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
-                          const unsigned int *idx);
+ULIB_IF int ulib_bitset_set_bits (ulib_bitset *set, unsigned int n,
+                                  const unsigned int *idx);
 
 /* Clear bit N in the bitset SET.  */
-void ulib_bitset_clear (ulib_bitset *set, unsigned int n);
+ULIB_IF void ulib_bitset_clear (ulib_bitset *set, unsigned int n);
 
 /* Clear each bit, whose index is in the array IDX of length N.  */
-void ulib_bitset_clear_bits (ulib_bitset *set, unsigned int n,
-                             const unsigned int *idx);
+ULIB_IF void ulib_bitset_clear_bits (ulib_bitset *set, unsigned int n,
+                                     const unsigned int *idx);
 
 /* Clear all bits in a bitset.  */
 static inline void
@@ -48,68 +49,68 @@ ulib_bitset_clear_all (ulib_bitset *set)
 }
 
 /* Check whether bit N in the set SET is non-zero.  */
-int ulib_bitset_is_set (const ulib_bitset *set, unsigned int n);
+ULIB_IF int ulib_bitset_is_set (const ulib_bitset *set, unsigned int n);
 
 /* Set theoretic union: DST = SRC1 | SRC2.  */
-int ulib_bitset_or (ulib_bitset *restrict dst,
-                    const ulib_bitset *restrict src1,
-                    const ulib_bitset *restrict src2);
+ULIB_IF int ulib_bitset_or (ulib_bitset *restrict dst,
+                            const ulib_bitset *restrict src1,
+                            const ulib_bitset *restrict src2);
 
 /* Destructive set theoretic union: DST |= SRC.  */
-int ulib_bitset_destr_or (ulib_bitset *restrict dst,
-                          const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_or (ulib_bitset *restrict dst,
+                                  const ulib_bitset *restrict src);
 
 /* Destructive set theoretic union: DST |= SRC.  Returns negative on
    error, positive if the DST changed or zero otherwise.  */
-int ulib_bitset_destr_or_chg (ulib_bitset *restrict dst,
-                              const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_or_chg (ulib_bitset *restrict dst,
+                                      const ulib_bitset *restrict src);
 
 /* Set theoretic intersection: DST = SRC1 & SRC2.  */
-int ulib_bitset_and (ulib_bitset *restrict dst,
-                     const ulib_bitset *restrict src1,
-                     const ulib_bitset *restrict src2);
+ULIB_IF int ulib_bitset_and (ulib_bitset *restrict dst,
+                             const ulib_bitset *restrict src1,
+                             const ulib_bitset *restrict src2);
 
 /* Destructive set theoretic intersection: DST &= SRC.  */
-int ulib_bitset_destr_and (ulib_bitset *restrict dst,
-                           const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_and (ulib_bitset *restrict dst,
+                                   const ulib_bitset *restrict src);
 
 /* Destructive set theoretic intersection: DST &= SRC.  Returns
    negative on error, positive if the DST changed or zero
    otherwise. */
-int ulib_bitset_destr_and_chg (ulib_bitset *restrict dst,
-                               const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_and_chg (ulib_bitset *restrict dst,
+                                       const ulib_bitset *restrict src);
 
 /* Set theoretic difference: DST = SRC1 & ~SRC2.  */
-int ulib_bitset_andn (ulib_bitset *restrict dst,
-                      const ulib_bitset *restrict src1,
-                      const ulib_bitset *restrict src2);
+ULIB_IF int ulib_bitset_andn (ulib_bitset *restrict dst,
+                              const ulib_bitset *restrict src1,
+                              const ulib_bitset *restrict src2);
 
 /* Destructive set theoretic difference: DST &= ~SRC.  */
-int ulib_bitset_destr_andn (ulib_bitset *restrict dst,
-                            const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_andn (ulib_bitset *restrict dst,
+                                    const ulib_bitset *restrict src);
 
 /* Destructive set theoretic difference: DST = & ~SRC.  Returns
    negative on error, positive if the DST changed or zero
    otherwise.  */
-int ulib_bitset_destr_andn_chg (ulib_bitset *restrict dst,
-                                const ulib_bitset *restrict src);
+ULIB_IF int ulib_bitset_destr_andn_chg (ulib_bitset *restrict dst,
+                                        const ulib_bitset *restrict src);
 
 /* Compute DST = SRC1 | (SRC2 & ~SRC3)  */
-int ulib_bitset_or_andn (ulib_bitset *restrict dst,
-                         const ulib_bitset *restrict src1,
-                         const ulib_bitset *restrict src2,
-                         const ulib_bitset *restrict src3);
+ULIB_IF int ulib_bitset_or_andn (ulib_bitset *restrict dst,
+                                 const ulib_bitset *restrict src1,
+                                 const ulib_bitset *restrict src2,
+                                 const ulib_bitset *restrict src3);
 
 /* Compute DST |= SRC1 & ~SRC2  */
-int ulib_bitset_destr_or_andn (ulib_bitset *restrict dst,
-                               const ulib_bitset *restrict src1,
-                               const ulib_bitset *restrict src2);
+ULIB_IF int ulib_bitset_destr_or_andn (ulib_bitset *restrict dst,
+                                       const ulib_bitset *restrict src1,
+                                       const ulib_bitset *restrict src2);
 
 /* Compute DST |= SRC1 & ~SRC2.  Returns negative on error, positive
    if the DST changed or zero otherwise.  */
-int ulib_bitset_destr_or_andn_chg (ulib_bitset *restrict dst,
-                                   const ulib_bitset *restrict src1,
-                                   const ulib_bitset *restrict src2);
+ULIB_IF int ulib_bitset_destr_or_andn_chg (ulib_bitset *restrict dst,
+                                           const ulib_bitset *restrict src1,
+                                           const ulib_bitset *restrict src2);
 /* Copy a bitset.  */
 static inline int
 ulib_bitset_copy (ulib_bitset *restrict dst, const ulib_bitset *restrict src)
@@ -122,11 +123,11 @@ ulib_bitset_copy (ulib_bitset *restrict dst, const ulib_bitset *restrict src)
 }
 
 /* Return the one plus the index of the last bit set.  */
-unsigned int ulib_bitset_max (const ulib_bitset *);
+ULIB_IF unsigned int ulib_bitset_max (const ulib_bitset *);
 
 /* Check whether set A is a subset of set B.  */
-int ulib_bitset_is_subset (const ulib_bitset *restrict a,
-                           const ulib_bitset *restrict b);
+ULIB_IF int ulib_bitset_is_subset (const ulib_bitset *restrict a,
+                                   const ulib_bitset *restrict b);
 
 /* Check whether a bitset is empty.  */
 static inline int
