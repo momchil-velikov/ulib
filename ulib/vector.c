@@ -195,7 +195,7 @@ ulib_vector_set_func (ulib_vector *v, unsigned int idx, ulib_func func)
 int
 ulib__vector_moveup (ulib_vector *v, unsigned int idx)
 {
-  if (idx >= v->navail && grow (v, idx + 1) < 0)
+  if (v->nelt + 1 >= v->navail && grow (v, v->nelt + 1) < 0)
     return -1;
 
   if (idx < v->nelt)

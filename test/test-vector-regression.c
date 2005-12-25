@@ -73,6 +73,8 @@ test_2()
 
   p = ulib_vector_front (&v);
   assert (p [0] == 1 && p [1] == 3 && p [2] == 4);
+
+  ulib_vector_destroy (&v);
 }
 
 int
