@@ -201,7 +201,7 @@ ulib__vector_moveup (ulib_vector *v, unsigned int idx)
   if (idx < v->nelt)
     {
       char *dst = (char *) v->data + idx * v->elt_size;
-      memmove (dst + v->elt_size, dst, v->nelt - idx);
+      memmove (dst + v->elt_size, dst, (v->nelt - idx) * v->elt_size);
     }
 
   return 0;
@@ -218,7 +218,7 @@ ulib_vector_remove (ulib_vector *v, unsigned int idx)
   if (idx < v->nelt)
     {
       dst = (char *) v->data + idx * v->elt_size;
-      memmove (dst, dst + v->elt_size, v->nelt - idx);
+      memmove (dst, dst + v->elt_size, (v->nelt - idx) * v->elt_size);
     }
 }
 
