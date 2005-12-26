@@ -93,7 +93,7 @@ used_len (const ulib_bitset *set)
     {
       i = set->used_len - 1;
       elt = ulib_vector_elt (&set->bits, i - 1);
-      while (*elt == 0 && i > 0)
+      while (i > 0 && *elt == 0)
         {
           --i;
           --elt;

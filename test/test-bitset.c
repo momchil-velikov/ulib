@@ -589,9 +589,9 @@ test_bitset_destr_or_andn ()
     {
       do
         {
-          d = ulib_rand (0, NSETS_MAX - 1);
-          s1 = ulib_rand (0, NSETS_MAX - 1);
-          s2 = ulib_rand (0, NSETS_MAX - 1);
+          d = ulib_rand (1, NSETS_MAX - 1);
+          s1 = ulib_rand (1, NSETS_MAX - 1);
+          s2 = ulib_rand (1, NSETS_MAX - 1);
         }
       while (d == s1 || d == s2 || s1 == s2);
 
