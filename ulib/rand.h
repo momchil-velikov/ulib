@@ -11,7 +11,7 @@ BEGIN_DECLS
 static inline unsigned int
 ulib_rand (unsigned int lo, unsigned int hi)
 {
-  return (unsigned int) (lo + (hi - lo) * (rand () / (double) RAND_MAX));
+  return (unsigned int) (rand () / (RAND_MAX + 1.0) * (hi - lo + 1) + lo);
 }
 
 END_DECLS
