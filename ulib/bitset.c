@@ -57,7 +57,7 @@ static const unsigned int msb_set_tab [] =
   /* 1111 */ 1
 };
 
-unsigned int
+static unsigned int
 bitset_elt_ffs (bitset_elt elt)
 {
   bitset_elt mask;
