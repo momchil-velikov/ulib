@@ -4,7 +4,7 @@ config_h = smk.make_keyword_subst (smk.env.host_cf, 'config.h')
 smk.env.all.depends (config_h)
 
 ulib_srcs = ['hash.c', 'vector.c', 'utf8.c', 'pgalloc.c', 'cache.c', 'log.c',
-             'bitset.c', 'time.c']
+             'bitset.c', 'time.c', 'rand.c']
 
 ulib_hdrs = ['avl-tree.h', 'avl-tree.c', 'cache.h', 'defs.h',
              'hash.h', 'list.h', 'pgalloc.h', 'splay-tree.h',
