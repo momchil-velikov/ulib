@@ -1,6 +1,6 @@
 tests = ['test-pgalloc', 'test-cache', 'test-splay-tree',
          'test-splay-tree-gc', 'test-avl-tree', 'test-bitset',
-         'test-vector-regression']
+         'test-options', 'test-vector-regression']
 
 for prog in [smk.make_program (x, srcs = [x + '.c'], libs = [libulib])
              for x in tests]:
