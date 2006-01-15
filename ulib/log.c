@@ -101,7 +101,7 @@ ulib_log_vprintf (ulib_log *log, const char *fmt, va_list ap)
         goto error;
       
       buf = nbuf;
-      if ((n = vsnprintf (buf, n, fmt, ap)) < 0)
+      if ((n = vsnprintf (buf, n + 1, fmt, ap)) < 0)
         goto error;
     }
 
