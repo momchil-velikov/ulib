@@ -94,36 +94,15 @@ m_cb (const char *arg)
 
 static struct ulib_option options [] =
 {
-  {
-    .key = 'a',
-    .flags = ulib_option_no_arg
-  },
+  {.key = 'a' },
 
-  {
-    .name = "b-long",
-    .flags = ulib_option_no_arg
-  },
+  { .name = "b-long" },
 
-  {
-    .key = 'c',
-    .name = "c-long",
-    .flags = ulib_option_no_arg
-  },
+  { .key = 'c', .name = "c-long" },
 
-  {
-    .key = 'd',
-    .name = "d-long",
-    .flag = &d_flag,
-    .value = 1,
-    .flags = ulib_option_no_arg
-  },
+  { .key = 'd', .name = "d-long", .flag = &d_flag, .value = 1 },
 
-  {
-    .key = 'e',
-    .name = "e-long",
-    .cb = e_cb,
-    .flags = ulib_option_no_arg
-  },
+  { .key = 'e', .name = "e-long", .cb = e_cb },
 
 
   {

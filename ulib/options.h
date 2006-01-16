@@ -15,7 +15,7 @@ typedef int (*ulib_opt_cb) (const char *optarg);
 /* Option flags.  */
 enum ulib_option_flags
 {
-  ulib_option_no_arg = 1,
+  ulib_option_no_arg,
   ulib_option_required_arg,
   ulib_option_optional_arg
 };
