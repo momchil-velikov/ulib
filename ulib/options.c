@@ -5,7 +5,7 @@
    OPTS.  */
 int
 ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
-                    ulib_log *log)
+                    FILE *err)
 {
   int next_arg, next_arg_taken, key;
   const char *opt_name, *opt_arg;
@@ -58,17 +58,17 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
           if (argv [next_arg][0] == '-')
             {
               if (key == -1)
-                ulib_log_printf (log, "ERROR: Unknown option ``%s''",
-                                 argv [next_arg]);
+                fprintf (err, "%s: ERROR: Unknown option ``%s''\n",
+                         argv [0], argv [next_arg]);
               else
-                ulib_log_printf (log, "ERROR: Unknown option ``%c''",
-                                 argv [next_arg][key]);
+                fprintf (err, "%s: ERROR: Unknown option ``%c''\n",
+                         argv [0], argv [next_arg][key]);
               return -1;
             }
           else if (opt->cb == 0)
             {
-              ulib_log_printf (log, "WARNING: Non-option argument ``%s''"
-                               " not processed", argv [next_arg]);
+              fprintf (err, "%s: WARNING: Non-option argument ``%s''"
+                       " not processed\n", argv [0], argv [next_arg]);
             }
           else if (opt->cb (argv [next_arg]) < 0)
             return -1;
@@ -88,9 +88,8 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
               if (opt_arg != 0)
                 {
                   if (key == -1)
-                    ulib_log_printf (log, "ERROR: Option ``--%s''"
-                                     " takes no arguments",
-                                     opt->name);
+                    fprintf (err, "%s: ERROR: Option ``--%s'' takes no"
+                             " arguments\n", argv [0], opt->name);
                   return -1;
                 }
             }
@@ -111,13 +110,11 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
                   else
                     {
                       if (key == -1)
-                        ulib_log_printf (log, "ERROR: Option ``--%s''"
-                                         " requires an argument",
-                                         opt->name);
+                        fprintf (err, "%s: ERROR: Option ``--%s'' requires"
+                                 " an argument\n", argv [0], opt->name);
                       else
-                        ulib_log_printf (log, "ERROR: Option ``-%c''"
-                                         " requires an argument",
-                                         opt->key);
+                        fprintf (err, "%s: ERROR: Option ``-%c'' requires"
+                                 " an argument\n", argv [0], opt->key);
 
                       return -1;
                     }
@@ -147,9 +144,8 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
           /* Invoke the callback.  */
           if (opt->cb == 0 && opt_arg != 0)
             {
-              ulib_log_printf (log, "ERROR: Unable to process "
-                               "option argument ``%s''",
-                               opt_arg);
+              fprintf (err, "%s: ERROR: Unable to process option"
+                       " argument ``%s''\n", argv [0], opt_arg);
               return -1;
             }
 
@@ -194,17 +190,18 @@ ulib_options_help (FILE *out, const ulib_option *opts)
       if (opt->key && opt->name)
         {
           if (opt->flags == ulib_option_required_arg)
-            fprintf (out, "-%c %s, --%s=%s", opt->key, arg, opt->name, arg);
+            fprintf (out, "  -%c %s, --%s=%s", opt->key, arg, opt->name, arg);
           else if (opt->flags == ulib_option_optional_arg)
-            fprintf (out, "-%c [%s], --%s[=%s]", opt->key, arg, opt->name, arg);
+            fprintf (out, "  -%c [%s], --%s[=%s]", opt->key, arg, opt->name,
+                     arg);
           else
-            fprintf (out, "-%c, --%s", opt->key, opt->name);
+            fprintf (out, "  -%c, --%s", opt->key, opt->name);
         }
       else
         {
           if (opt->key)
             {
-              fprintf (out, "-%c", opt->key);
+              fprintf (out, "  -%c", opt->key);
               if (opt->flags == ulib_option_required_arg)
                 fprintf (out, " %s", arg);
               else if (opt->flags == ulib_option_optional_arg)
@@ -212,7 +209,7 @@ ulib_options_help (FILE *out, const ulib_option *opts)
             }
           else if (opt->name)
             {
-              fprintf (out, "--%s", opt->name);
+              fprintf (out, "-  -%s", opt->name);
               if (opt->flags == ulib_option_required_arg)
                 fprintf (out, "=%s", arg);
               else if (opt->flags == ulib_option_optional_arg)

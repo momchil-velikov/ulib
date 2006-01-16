@@ -3,7 +3,6 @@
 
 #include "defs.h"
 #include "ulib-if.h"
-#include "log.h"
 #include <stdio.h>
 
 BEGIN_DECLS
@@ -53,7 +52,7 @@ typedef struct ulib_option ulib_option;
 /* Parse the command line according to option descriptions in
    OPTS.  */
 ULIB_IF int ulib_options_parse (const ulib_option *opts, int argc,
-                                const char *argv[], ulib_log *log);
+                                const char *argv[], FILE *err);
 
 /* Display options help.  */
 ULIB_IF void ulib_options_help (FILE *out, const ulib_option *opts);

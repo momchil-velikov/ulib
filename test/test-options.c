@@ -1,18 +1,17 @@
 #include <ulib/options.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #ifdef strcmp
 #undef strcmp
 #endif
 
-static ulib_log log;
-
 static int
 process_non_option_arg (const char *arg)
 {
   assert (arg != 0);
-  ulib_log_printf (&log, "Found non-option argument ``%s''", arg);
+  fprintf (stderr, "test: INFO: Found non-option argument ``%s''\n", arg);
   return 0;
 }
 
@@ -178,11 +177,8 @@ test_a ()
   volatile int sts;
   static const char *argv_0 [] = {"test", "-a", 0};
 
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
-
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -193,20 +189,14 @@ test_b ()
   static const char *argv_1 [] = {"test", "--b-long=", 0};
   static const char *argv_2 [] = {"test", "--b-long=foo", 0};
 
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -218,25 +208,17 @@ test_c ()
   static const char *argv_2 [] = {"test", "--c-long=", 0};
   static const char *argv_3 [] = {"test", "--c-long=foo", 0};
 
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -249,32 +231,24 @@ test_d ()
   static const char *argv_3 [] = {"test", "--d-long=foo", 0};
 
   d_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == -1);
   assert (d_flag == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == -1);
   assert (d_flag == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -287,32 +261,24 @@ test_e ()
   static const char *argv_3 [] = {"test", "--e-long=foo", 0};
 
   e_cb_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (e_cb_flag == 2);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   e_cb_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == 0);
   assert (e_cb_flag == 2);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   e_cb_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == -1);
   assert (e_cb_flag == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   e_cb_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == -1);
   assert (e_cb_flag == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 
@@ -325,25 +291,19 @@ test_f ()
   static const char *argv_2 [] = {"test", "-f", "-a", 0};
 
   f_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (f_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   f_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (f_cb_arg != 0 && strcmp (f_cb_arg, "f-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   f_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (f_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -356,32 +316,24 @@ test_g ()
   static const char *argv_3 [] = {"test", "--g-long", "-a", 0};
 
   g_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (g_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   g_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (g_cb_arg != 0 && strcmp (g_cb_arg, "g-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   g_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (g_cb_arg != 0 && strcmp (g_cb_arg, "g-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   g_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == 0);
   assert (g_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -398,53 +350,39 @@ test_h ()
   static const char *argv_6 [] = {"test", "-h", "-a", 0};
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (h_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (h_cb_arg != 0 && strcmp (h_cb_arg, "h-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (h_cb_arg != 0 && strcmp (h_cb_arg, "h-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == 0);
   assert (h_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_4, &log);
+  sts = ulib_options_parse (options, 2, argv_4, stderr);
   assert (sts == 0);
   assert (h_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0);
   assert (h_cb_arg != 0 && strcmp (h_cb_arg, "h-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   h_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_6, &log);
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
   assert (sts == 0);
   assert (h_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -462,66 +400,52 @@ test_i ()
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_4, &log);
+  sts = ulib_options_parse (options, 2, argv_4, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_6, &log);
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
   assert (sts == 0);
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 
@@ -534,25 +458,19 @@ test_j ()
   static const char *argv_2 [] = {"test", "-j", "-a", 0};
 
   j_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == -1);
   assert (j_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   j_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (j_cb_arg != 0 && strcmp (j_cb_arg, "j-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   j_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == -1);
   assert (j_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -565,32 +483,24 @@ test_k ()
   static const char *argv_3 [] = {"test", "--k-long", "-a", 0};
 
   k_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == -1);
   assert (k_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   k_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (k_cb_arg != 0 && strcmp (k_cb_arg, "k-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   k_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (k_cb_arg != 0 && strcmp (k_cb_arg, "k-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   k_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == -1);
   assert (k_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -607,53 +517,39 @@ test_l ()
   static const char *argv_6 [] = {"test", "-l", "-a", 0};
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == -1);
   assert (l_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (l_cb_arg != 0 && strcmp (l_cb_arg, "l-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (l_cb_arg != 0 && strcmp (l_cb_arg, "l-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == -1);
   assert (l_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_4, &log);
+  sts = ulib_options_parse (options, 2, argv_4, stderr);
   assert (sts == -1);
   assert (l_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0);
   assert (l_cb_arg != 0 && strcmp (l_cb_arg, "l-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   l_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_6, &log);
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
   assert (sts == -1);
   assert (l_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -671,66 +567,52 @@ test_m ()
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == -1);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg-1") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == -1);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 2, argv_4, &log);
+  sts = ulib_options_parse (options, 2, argv_4, stderr);
   assert (sts == -1);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_6, &log);
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
   assert (sts == -1);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 
@@ -747,57 +629,45 @@ test_adi ()
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_3, &log);
+  sts = ulib_options_parse (options, 2, argv_3, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_4, &log);
+  sts = ulib_options_parse (options, 2, argv_4, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 2, argv_5, &log);
+  sts = ulib_options_parse (options, 2, argv_5, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -814,63 +684,51 @@ test_adi_arg ()
   d_flag = 0;
   i_flag = 0;
   i_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_0, &log);
+  sts = ulib_options_parse (options, 3, argv_0, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 3, argv_4, &log);
+  sts = ulib_options_parse (options, 3, argv_4, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   d_flag = 0;
   i_flag = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0);
   assert (d_flag == 1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 static void
@@ -888,79 +746,67 @@ test_aim_arg ()
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_0, &log);
+  sts = ulib_options_parse (options, 3, argv_0, stderr);
   assert (sts == -1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_1, &log);
+  sts = ulib_options_parse (options, 3, argv_1, stderr);
   assert (sts == 0 );
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_2, &log);
+  sts = ulib_options_parse (options, 3, argv_2, stderr);
   assert (sts == -1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == -1);
   assert (i_flag == 3);
   assert (i_cb_arg != 0 && strcmp (i_cb_arg, "i-arg") == 0);
   assert (m_flag == 0);
   assert (m_cb_arg == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_4, &log);
+  sts = ulib_options_parse (options, 3, argv_4, stderr);
   assert (sts == 0 );
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
   i_flag = 0;
   i_cb_arg = 0;
   m_flag = 0;
   m_cb_arg = 0;
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == 0 );
   assert (i_flag == 3);
   assert (i_cb_arg == 0);
   assert (m_flag == 4);
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 
@@ -996,60 +842,38 @@ test_errors ()
   static const char *argv_9 [] = {"test", "--n-long=n-arg-1", "n-arg", 0 };
   static const char *argv_10 [] = {"test", "nonopt-arg", 0 };
 
-  sts = ulib_options_parse (options, 2, argv_0, &log);
+  sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_1, &log);
+  sts = ulib_options_parse (options, 2, argv_1, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 2, argv_2, &log);
+  sts = ulib_options_parse (options, 2, argv_2, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 3, argv_3, &log);
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 3, argv_4, &log);
+  sts = ulib_options_parse (options, 3, argv_4, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 3, argv_5, &log);
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options, 3, argv_6, &log);
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options_no_cb, 3, argv_7, &log);
+  sts = ulib_options_parse (options_no_cb, 3, argv_7, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options_no_cb, 3, argv_8, &log);
+  sts = ulib_options_parse (options_no_cb, 3, argv_8, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options_no_cb, 3, argv_9, &log);
+  sts = ulib_options_parse (options_no_cb, 3, argv_9, stderr);
   assert (sts == -1);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 
-  sts = ulib_options_parse (options_no_cb, 2, argv_10, &log);
+  sts = ulib_options_parse (options_no_cb, 2, argv_10, stderr);
   assert (sts == 0);
-  ulib_log_write (&log, stderr);
-  ulib_log_clear (&log, 0);
 }
 
 
@@ -1191,7 +1015,7 @@ test_random_cmdlines ()
       while ((*argv) [argc])
         ++argc;
 
-      sts = ulib_options_parse (options, argc, *argv, &log);
+      sts = ulib_options_parse (options, argc, *argv, stderr);
       assert (sts == 0);
 
       ++argv;
@@ -1217,16 +1041,16 @@ static const ulib_option smk_options [] =
     .help = "\t\t\tDisplay usage information" },
 
   { .key = 'i', .name = "install",
-    .help = "\t\t\tInstall the package" },
+    .help = "\t\tInstall the package" },
 
   { .key = 'j', .name = "jobs", .flags = ulib_option_required_arg,
-    .arg = "<num>", .help = "\t\tRun multiple jobs in parallel" },
+    .arg = "<num>", .help = "\tRun multiple jobs in parallel" },
 
   { .key = 'k', .name = "keep-going",
     .help = "\t\tKeep going when some targets can't be made" },
 
   { .key = 'n', .name = "dry-run",
-    .help = "\t\t\tDo not execute commands" },
+    .help = "\t\tDo not execute commands" },
 
   { .key = 'o', .name = "output", .flags = ulib_option_required_arg,
     .arg = "<name>", .help = "\tSpecify top level build directory" },
@@ -1244,10 +1068,10 @@ static const ulib_option smk_options [] =
     .help = "\t\tUninstall the package" },
 
   { .key = 'V', .name = "version",
-    .help = "\t\t\tDisplay version" },
+    .help = "\t\tDisplay version" },
 
   { .key = 'v', .name = "verbose",
-    .help = "\t\t\tVerbose messages" },
+    .help = "\t\tVerbose messages" },
 
   { .key = 'x', .name = "xml",
     .help = "\t\t\tGenerate XML report" },
@@ -1264,7 +1088,6 @@ test_option_help ()
 int
 main ()
 {
-  ulib_log_init (&log, "test-options");
 
   test_a ();
   test_b ();
