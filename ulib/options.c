@@ -29,6 +29,14 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
             {
               if (argv [next_arg][1] == '-')
                 {
+                  if (argv [next_arg][2] == '\0')
+                    {
+                      /* End of options and start of non-option
+                         arguments.  */
+                      ++next_arg;
+                      break;
+                    }
+
                   /* Separate the option name from a possible argument.  */
                   opt_name = argv [next_arg] + 2;
                   opt_arg = strchr (opt_name, '=');
@@ -168,6 +176,24 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
           next_arg += next_arg_taken ? 2 : 1;
           next_arg_taken = 0;
         }
+    }
+
+  /* Get the non-option arguments handler.  */
+  for (opt = opts; opt->key != 0 || opt->name != 0; ++opt)
+    ;
+
+  /* Process remaining non-option arguments.  */
+  while (next_arg < argc)
+    {
+      if (opt->cb == 0)
+        {
+          fprintf (err, "%s: WARNING: Non-option argument ``%s''"
+                   " not processed\n", argv [0], argv [next_arg]);
+        }
+      else if (opt->cb (argv [next_arg]) < 0)
+        return -1;
+
+      ++next_arg;
     }
 
   return 0;

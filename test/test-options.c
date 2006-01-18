@@ -809,6 +809,62 @@ test_aim_arg ()
   assert (m_cb_arg != 0 && strcmp (m_cb_arg, "m-arg") == 0);
 }
 
+/* Test non-option arguments separator.  */
+static void
+test_nonopt_args ()
+{
+  volatile int sts;
+  static const char *argv_0 [] = {"test", "--i-long", "--", 0};
+  static const char *argv_1 [] = {"test", "--", "--i-long", "i-arg", 0};
+  static const char *argv_2 [] = {"test", "--i-long", "--", "i-arg", 0};
+
+  static const char *argv_3 [] = {"test", "-i", "--", 0};
+  static const char *argv_4 [] = {"test", "--", "-i", "i-arg", 0};
+  static const char *argv_5 [] = {"test", "-i", "--", "i-arg", 0};
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 3, argv_0, stderr);
+  assert (sts == 0);
+  assert (i_flag == 3);
+  assert (i_cb_arg == 0);
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 4, argv_1, stderr);
+  assert (sts == 0);
+  assert (i_flag == 0);
+  assert (i_cb_arg == 0);
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 4, argv_2, stderr);
+  assert (sts == 0);
+  assert (i_flag == 3);
+  assert (i_cb_arg == 0);
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 3, argv_3, stderr);
+  assert (sts == 0);
+  assert (i_flag == 3);
+  assert (i_cb_arg == 0);
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 4, argv_4, stderr);
+  assert (sts == 0);
+  assert (i_flag == 0);
+  assert (i_cb_arg == 0);
+
+  i_flag = 0;
+  i_cb_arg = 0;
+  sts = ulib_options_parse (options, 4, argv_5, stderr);
+  assert (sts == 0);
+  assert (i_flag == 3);
+  assert (i_cb_arg == 0);
+}
+
 
 static struct ulib_option options_no_cb [] =
 {
@@ -823,7 +879,6 @@ static struct ulib_option options_no_cb [] =
     .key = '\0'
   }
 };
-
 
 static void
 test_errors ()
@@ -1105,6 +1160,7 @@ main ()
   test_adi ();
   test_adi_arg ();
   test_aim_arg ();
+  test_nonopt_args ();
   test_errors ();
   test_random_cmdlines ();
   test_option_help ();
