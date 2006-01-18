@@ -230,6 +230,11 @@ test_d ()
   static const char *argv_2 [] = {"test", "--d-long=", 0};
   static const char *argv_3 [] = {"test", "--d-long=foo", 0};
 
+  static const char *argv_4 [] = {"test", "non-opt", "-d", 0};
+  static const char *argv_5 [] = {"test", "non-opt", "--d-long", 0};
+  static const char *argv_6 [] = {"test", "non-opt", "--d-long=", 0};
+  static const char *argv_7 [] = {"test", "non-opt", "--d-long=foo", 0};
+
   d_flag = 0;
   sts = ulib_options_parse (options, 2, argv_0, stderr);
   assert (sts == 0);
@@ -247,6 +252,26 @@ test_d ()
 
   d_flag = 0;
   sts = ulib_options_parse (options, 2, argv_3, stderr);
+  assert (sts == -1);
+  assert (d_flag == 0);
+
+  d_flag = 0;
+  sts = ulib_options_parse (options, 3, argv_4, stderr);
+  assert (sts == 0);
+  assert (d_flag == 1);
+
+  d_flag = 0;
+  sts = ulib_options_parse (options, 3, argv_5, stderr);
+  assert (sts == 0);
+  assert (d_flag == 1);
+
+  d_flag = 0;
+  sts = ulib_options_parse (options, 3, argv_6, stderr);
+  assert (sts == -1);
+  assert (d_flag == 0);
+
+  d_flag = 0;
+  sts = ulib_options_parse (options, 3, argv_7, stderr);
   assert (sts == -1);
   assert (d_flag == 0);
 }

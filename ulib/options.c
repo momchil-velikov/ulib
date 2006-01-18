@@ -80,9 +80,6 @@ ulib_options_parse (const ulib_option *opts, int argc, const char *argv[],
             }
           else if (opt->cb (argv [next_arg]) < 0)
             return -1;
-
-          key = -1;
-          ++next_arg;
         }
       else
         {
