@@ -3,11 +3,12 @@
 
 #include "defs.h"
 #include "ulib-if.h"
+#include <stdint.h>
 
 BEGIN_DECLS
 
 /* Return the allocator page size.  */
-ULIB_IF unsigned int ulib_pgsize (void);
+ULIB_IF uintptr_t ulib_pgsize (void);
 
 /* Allocate a page, aligned on a page size boundary.  */
 ULIB_IF void *ulib_pgalloc (void);

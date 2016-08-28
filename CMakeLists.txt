@@ -2,6 +2,8 @@ project(libulib)
 
 cmake_minimum_required(VERSION 3.0)
 
+add_compile_options(-std=c11 -Wall -Wextra)
+
 add_library(ulib ulib/bitset.c ulib/cache.c ulib/hash.c ulib/log.c
             ulib/options.c ulib/pgalloc.c ulib/rand.c ulib/time.c
             ulib/utf8.c ulib/vector.c)

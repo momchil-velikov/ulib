@@ -46,7 +46,7 @@ static struct
   struct pgroup *free;
 
   /* Allocator page size. */
-  unsigned int pgsize;
+  uintptr_t pgsize;
 } G = { {0, 0}, 0, 0, 4096 };
 
 /* Initialize the page allocator.  */
@@ -58,7 +58,7 @@ pgalloc_init ()
 }
 
 /* Return the allocator page size.  */
-unsigned int
+uintptr_t
 ulib_pgsize ()
 {
   return G.pgsize;

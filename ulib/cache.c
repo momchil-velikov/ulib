@@ -157,7 +157,7 @@ align_uint (unsigned int n, unsigned int a)
 
 /* Align a pointer PTR to A boundary.  */
 static inline void *
-align_ptr (const void *ptr, unsigned int a)
+align_ptr (const void *ptr, uintptr_t a)
 {
   return (void *) (((uintptr_t) ptr + a - 1) & -a);
 }
