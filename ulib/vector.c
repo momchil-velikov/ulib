@@ -238,6 +238,5 @@ ulib_vector_copy (ulib_vector *dst, const ulib_vector *src)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 32517a6f-d411-4504-9013-cc0225752c04
  * End:
  */

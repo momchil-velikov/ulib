@@ -15,6 +15,5 @@
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 74cb5ec2-67b2-4635-9310-66e2ea244871
  * End:
  */

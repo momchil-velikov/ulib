@@ -20,7 +20,6 @@ ulib_shuffle (unsigned int n, unsigned int *v)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: c0545edf-696a-49a4-a9dc-6fbb6d97c5f1
  * End:
  */
 

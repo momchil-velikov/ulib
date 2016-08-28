@@ -251,6 +251,5 @@ ulib_options_help (FILE *out, const ulib_option *opts)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 5f06e6cf-a94a-45ee-a6f9-fc44a76bd783
  * End:
  */

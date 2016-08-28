@@ -116,6 +116,5 @@ ulib_strnhash (const char *str, unsigned int n)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: ea2c00a2-855e-43f1-874a-b22300869ebc
  * End:
  */

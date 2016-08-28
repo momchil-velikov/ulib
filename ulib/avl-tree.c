@@ -349,6 +349,5 @@ ULIB_AVL_TREE (lookup) (const ULIB_AVL_TREE_TYPE *r,
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: a948d7ae-81a5-4a93-a17d-979d56a5ab12
  * End:
  */

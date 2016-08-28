@@ -1,16 +1,7 @@
 #include "log.h"
 #include <stdarg.h>
 #include <errno.h>
-
-#include <ulib/config.h>
-
-#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-
-#if HAVE_IO_H
-#include <io.h>
-#endif
 
 #ifdef _WIN32
 #define vsnprintf _vsnprintf
@@ -178,6 +169,5 @@ ulib_log_writefd (ulib_log *log, int fd)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: ef0fa690-ef5f-4934-82aa-d8d0d8bc8c23
  * End:
  */

@@ -223,6 +223,5 @@ utf8_wcstombs (char *string, size_t *n,
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: ed8b2169-24ce-43e3-b9f7-e4ca2bb175c4
  * End:
  */

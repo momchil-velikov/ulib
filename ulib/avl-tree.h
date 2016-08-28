@@ -15,7 +15,7 @@ BEGIN_DECLS
 #endif
 
 #ifndef ULIB_STATIC
-#define ULIB_STATIC
+#define ULIB_STATIC extern
 #endif
 
 #define ULIB___AVL_TREE(a,b) a##_##b
@@ -45,7 +45,7 @@ ULIB_AVL_TREE (del) (ULIB_AVL_TREE_TYPE **pr,
 
 /* Remove a key from an AVL tree. Return the removed node or null if
    the key is not found.  */
-ULIB_STATIC inline ULIB_AVL_TREE_TYPE *
+static inline ULIB_AVL_TREE_TYPE *
 ULIB_AVL_TREE (delete) (ULIB_AVL_TREE_TYPE **pr, ULIB_AVL_TREE_KEY_TYPE key)
 {
   ULIB_AVL_TREE_TYPE *dn;
@@ -66,6 +66,5 @@ ULIB_AVL_TREE (lookup) (const ULIB_AVL_TREE_TYPE *r,
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 04eca3c3-03ec-4b83-be20-77d663bbb9b6
  * End:
  */

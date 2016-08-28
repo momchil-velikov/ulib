@@ -52,6 +52,5 @@ typedef void (*ulib_func)();
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 3a0d4cb3-eed7-4db5-9928-195aa7ddb6eb
  * End:
  */

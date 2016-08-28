@@ -813,6 +813,5 @@ ulib_bitset_is_subset (const ulib_bitset *restrict a,
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 8fab10b8-526e-4130-a295-cb6d120ad437
  * End:
  */

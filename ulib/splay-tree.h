@@ -15,7 +15,7 @@ BEGIN_DECLS
 #endif
 
 #ifndef ULIB_STATIC
-#define ULIB_STATIC
+#define ULIB_STATIC extern
 #endif
 
 #define ULIB___SPLAY_TREE(a,b) a##_##b
@@ -71,6 +71,5 @@ END_DECLS
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: a87ff610-1e43-43fd-989d-5f13da7b0874
  * End:
  */

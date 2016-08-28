@@ -136,6 +136,5 @@ ULIB_SPLAY_TREE (delete) (ULIB_SPLAY_TREE_TYPE **r,
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 3be806a8-2e4d-4368-867c-916fa2c0f610
  * End:
  */

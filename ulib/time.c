@@ -37,6 +37,5 @@ ulib_gettime (ulib_time *timep)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 8c3fd0b0-e079-44fd-8295-929f02be6666
  * End:
  */

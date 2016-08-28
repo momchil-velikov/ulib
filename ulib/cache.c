@@ -5,16 +5,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
-
-#include <ulib/config.h>
-
-#if HAVE_INTTYPES_H
 #include <inttypes.h>
-#endif
-
-#if !HAVE_UINTPTR_T
-typedef unsigned long uintptr_t;
-#endif
 
 struct slab
 {
@@ -801,6 +792,5 @@ void ulib_gcrun ()
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: a6b54383-e52c-4718-900f-aa1586ee527d
  * End:
  */

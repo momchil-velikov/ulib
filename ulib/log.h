@@ -54,6 +54,5 @@ END_DECLS
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: ff781dc2-086d-4f99-a512-a7f40a063c26
  * End:
  */

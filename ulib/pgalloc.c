@@ -1,16 +1,8 @@
 #include "pgalloc.h"
 #include "list.h"
-#include <ulib/config.h>
 
 #include <stdlib.h>
-
-#if HAVE_INTTYPES_H
 #include <inttypes.h>
-#endif
-
-#if !HAVE_UINTPTR_T
-typedef unsigned long uintptr_t;
-#endif
 
 #define NPAGES 31
 #define ALLOC_MASK 0x7fffffff
@@ -251,6 +243,5 @@ ulib_pgfree (void *ptr)
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 585249ca-d593-4b58-abe7-874f6344adc1
  * End:
  */
