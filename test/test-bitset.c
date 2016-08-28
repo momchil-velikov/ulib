@@ -833,6 +833,5 @@ main ()
  * Local variables:
  * mode: C
  * indent-tabs-mode: nil
- * arch-tag: 228f20b7-011f-43b7-a851-84d4f7e20816
  * End:
  */

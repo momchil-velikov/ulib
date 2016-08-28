@@ -65,4 +65,3 @@ m-option : -m m-arg | --m-long m-arg | --m-long '=' m-arg ;
 
 m-arg : m-arg-value-1 | m-arg-value-2 ;
 
-/* arch-tag: ead5a689-98c1-4f2a-a809-965daf94af81 */
