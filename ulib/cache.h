@@ -13,7 +13,7 @@ BEGIN_DECLS
 /* Maximum object size.  We've come to this number empirically - it
    provides for reasonable memory utilization, while fitting in a
    single page.  */
-#define ULIB_CACHE_OBJECT_SIZE_MAX  926
+#define ULIB_CACHE_OBJECT_SIZE_MAX 926
 
 /* Minimum object alignment.  */
 #define ULIB_CACHE_OBJECT_ALIGN_MIN 4
@@ -23,60 +23,60 @@ BEGIN_DECLS
 #define ULIB_CACHE_OBJECT_ALIGN_MAX 128
 
 /* Constructor/destructor/clear function type.  */
-typedef int (*ulib_ctor_func) (void *obj, unsigned int size);
-typedef void (*ulib_clear_func) (void *obj, unsigned int size);
-typedef void (*ulib_dtor_func) (void *obj, unsigned int size);
+typedef int (*ulib_ctor_func)(void *obj, unsigned int size);
+typedef void (*ulib_clear_func)(void *obj, unsigned int size);
+typedef void (*ulib_dtor_func)(void *obj, unsigned int size);
 
 /* Garbage collection mark function type.  */
-typedef int (*ulib_gcscan_func) (void *obj, void **ptr, unsigned int sz);
+typedef int (*ulib_gcscan_func)(void *obj, void **ptr, unsigned int sz);
 
 typedef struct ulib_cache ulib_cache;
 
 /* Cache creation attributes.  */
-#define ULIB_CACHE_SIZE   1
-#define ULIB_CACHE_ALIGN  2
-#define ULIB_CACHE_CTOR   3
-#define ULIB_CACHE_CLEAR  4
-#define ULIB_CACHE_DTOR   5
-#define ULIB_CACHE_GC     6
+#define ULIB_CACHE_SIZE 1
+#define ULIB_CACHE_ALIGN 2
+#define ULIB_CACHE_CTOR 3
+#define ULIB_CACHE_CLEAR 4
+#define ULIB_CACHE_DTOR 5
+#define ULIB_CACHE_GC 6
 #define ULIB_CACHE_GCSCAN 7
 
 /* Create an object cache.  Throws NO_MEMORY, INVALID_PARAMETER.  */
-ULIB_IF ulib_cache *ulib_cache_create (int, ...);
+ULIB_IF ulib_cache *ulib_cache_create(int, ...);
 
 /* Allocate an object from a cache.  Throws NO_MEMORY.  */
-ULIB_IF void *ulib_cache_alloc (ulib_cache *);
+ULIB_IF void *ulib_cache_alloc(ulib_cache *);
 
 /* Release an object to the cache.  */
-ULIB_IF void ulib_cache_free (ulib_cache *, void *);
+ULIB_IF void ulib_cache_free(ulib_cache *, void *);
 
 /* Release cached objects.  */
-ULIB_IF void ulib_cache_flush (ulib_cache *);
+ULIB_IF void ulib_cache_flush(ulib_cache *);
 
 /* Register a non-cached root object.  */
-ULIB_IF int ulib_gcroot (void *, ulib_gcscan_func);
+ULIB_IF int ulib_gcroot(void *, ulib_gcscan_func);
 
 /* Register a cached root object.  */
-ULIB_IF int ulib_gcroot_cached (void *);
+ULIB_IF int ulib_gcroot_cached(void *);
 
 /* Unregister a root object.  */
-ULIB_IF void ulib_gcunroot (void *);
+ULIB_IF void ulib_gcunroot(void *);
 
 /* Push an allocation frame.  Objects, allocated in previous frames,
    won't be collected during the lifetime of this frame.  */
-ULIB_IF void ulib_gcpush (void);
+ULIB_IF void ulib_gcpush(void);
 
 /* Pop an allocation frame.  Live objects of the popped frame will be
    merged into the old frame.  */
-ULIB_IF void ulib_gcpop (void);
+ULIB_IF void ulib_gcpop(void);
 
 /* Perform garbage collection.  */
-ULIB_IF void ulib_gcrun (void);
+ULIB_IF void ulib_gcrun(void);
 
 END_DECLS
 
 #endif /* ulib__cache_h */
-
+
 /*
  * Local variables:
  * mode: C

@@ -17,152 +17,135 @@ static ulib_cache *uint_tree_cache;
 #define NLOOPS 10000000U
 #define NKEYS 1000U
 
-static void check_less_than (uint_tree *node, unsigned int key);
-static void check_greater_than (uint_tree *node, unsigned int key);
+static void check_less_than(uint_tree *node, unsigned int key);
+static void check_greater_than(uint_tree *node, unsigned int key);
 
 static void
-check_less_than (uint_tree *node, unsigned int key)
-{
-  if (node->key >= key)
-    abort ();
+check_less_than(uint_tree *node, unsigned int key) {
+    if (node->key >= key)
+        abort();
 
-  if (node->left)
-    check_less_than (node->left, key);
+    if (node->left)
+        check_less_than(node->left, key);
 
-  if (node->right)
-    check_less_than (node->right, key);
+    if (node->right)
+        check_less_than(node->right, key);
 }
 
 static void
-check_greater_than (uint_tree *node, unsigned int key)
-{
-  if (node->key <= key)
-    abort ();
+check_greater_than(uint_tree *node, unsigned int key) {
+    if (node->key <= key)
+        abort();
 
-  if (node->left)
-    check_greater_than (node->left, key);
+    if (node->left)
+        check_greater_than(node->left, key);
 
-  if (node->right)
-    check_greater_than (node->right, key);
+    if (node->right)
+        check_greater_than(node->right, key);
 }
 
 static void
-check_tree (uint_tree *node)
-{
-  if (node->left)
-    {
-      check_less_than (node->left, node->key);
-      check_tree (node->left);
+check_tree(uint_tree *node) {
+    if (node->left) {
+        check_less_than(node->left, node->key);
+        check_tree(node->left);
     }
 
-  if (node->right)
-    {
-      check_greater_than (node->right, node->key);
-      check_tree (node->right);
+    if (node->right) {
+        check_greater_than(node->right, node->key);
+        check_tree(node->right);
     }
 }
 
 static void
-dump_tree (uint_tree *t, int level)
-{
-  int i;
+dump_tree(uint_tree *t, int level) {
+    int i;
 
-  if (level == 0)
-    printf ("\n");
+    if (level == 0)
+        printf("\n");
 
-  for (i = 0; i < level; i++)
-    printf ("    ");
+    for (i = 0; i < level; i++)
+        printf("    ");
 
-  if (!t)
-    printf ("<null>\n");
-  else
-    {
-      printf ("key: %u, bal: %d\n", t->key, t->balance);
-      if (t->left || t->right)
-	{
-	  dump_tree (t->left, level + 1);
-	  dump_tree (t->right, level + 1);
-	}
+    if (!t)
+        printf("<null>\n");
+    else {
+        printf("key: %u, bal: %d\n", t->key, t->balance);
+        if (t->left || t->right) {
+            dump_tree(t->left, level + 1);
+            dump_tree(t->right, level + 1);
+        }
     }
 }
 
-static unsigned int key [NKEYS];
+static unsigned int key[NKEYS];
 static uint_tree *root;
 
 static unsigned int nins, ndel;
 
 static void
-test ()
-{
-  unsigned int i, idx;
-  uint_tree *elt;
+test() {
+    unsigned int i, idx;
+    uint_tree *elt;
 
-  for (i = 0; i < NLOOPS; i++)
-    {
-      idx = ulib_rand (0, NKEYS - 1);
-      if (key [idx])
-	{
-	  elt = uint_tree_delete (&root, key [idx]);
-	  ndel++;
-	  if (elt)
-	    ulib_cache_free (uint_tree_cache, elt);
-	  key [idx] = 0;
-	}
+    for (i = 0; i < NLOOPS; i++) {
+        idx = ulib_rand(0, NKEYS - 1);
+        if (key[idx]) {
+            elt = uint_tree_delete(&root, key[idx]);
+            ndel++;
+            if (elt)
+                ulib_cache_free(uint_tree_cache, elt);
+            key[idx] = 0;
+        }
 
-      elt = ulib_cache_alloc (uint_tree_cache);
-      elt->key = key [idx] = ulib_rand (0, NKEYS - 1);
-      while (uint_tree_insert (&root, elt) < 0)
-	{
-	  nins++;
-	  ulib_cache_free (uint_tree_cache, elt);
-	  elt = uint_tree_delete (&root, key [idx]);
-	  ndel++;
-	  elt->key = key [idx] = ulib_rand (0, NKEYS - 1);
-	}
-      nins++;
+        elt = ulib_cache_alloc(uint_tree_cache);
+        elt->key = key[idx] = ulib_rand(0, NKEYS - 1);
+        while (uint_tree_insert(&root, elt) < 0) {
+            nins++;
+            ulib_cache_free(uint_tree_cache, elt);
+            elt = uint_tree_delete(&root, key[idx]);
+            ndel++;
+            elt->key = key[idx] = ulib_rand(0, NKEYS - 1);
+        }
+        nins++;
     }
 
-  for (i = 0; i < NKEYS; i++)
-    if (key [i])
-      {
-	elt = uint_tree_delete (&root, key [i]);
-	ndel++;
-	if (elt)
-	  ulib_cache_free (uint_tree_cache, elt);
-      }
+    for (i = 0; i < NKEYS; i++)
+        if (key[i]) {
+            elt = uint_tree_delete(&root, key[i]);
+            ndel++;
+            if (elt)
+                ulib_cache_free(uint_tree_cache, elt);
+        }
 
-  ulib_cache_flush (uint_tree_cache);
+    ulib_cache_flush(uint_tree_cache);
 }
 
 int
-main ()
-{
-  ulib_time ts1, ts2;
-  double tm;
+main() {
+    ulib_time ts1, ts2;
+    double tm;
 
-  setvbuf (stdout, 0, _IONBF, 0);
+    setvbuf(stdout, 0, _IONBF, 0);
 
-  uint_tree_cache =
-    ulib_cache_create (ULIB_CACHE_SIZE, sizeof (uint_tree),
-		       ULIB_CACHE_ALIGN, sizeof (void *),
-		       0);
-  ulib_gettime (&ts1);
-  test ();
-  ulib_gettime (&ts2);
+    uint_tree_cache = ulib_cache_create(
+        ULIB_CACHE_SIZE, sizeof(uint_tree), ULIB_CACHE_ALIGN, sizeof(void *), 0);
+    ulib_gettime(&ts1);
+    test();
+    ulib_gettime(&ts2);
 
-  if (root)
-    check_tree (root);
+    if (root)
+        check_tree(root);
 
-  tm = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
+    tm = ts2.sec * 1e6 + ts2.usec - ts1.sec * 1e6 - ts1.usec;
 
-  printf ("time = %f s\n", tm / 1e6);
-  printf ("nins = %u, ndel = %u\n", nins, ndel);
-  printf ("nalloc/free = %u\n", NLOOPS);
-  printf ("avg alloc+ins+del+free = %f us\n",
-          tm / (nins + ndel + 2.0 * NLOOPS));
-  return 0;
+    printf("time = %f s\n", tm / 1e6);
+    printf("nins = %u, ndel = %u\n", nins, ndel);
+    printf("nalloc/free = %u\n", NLOOPS);
+    printf("avg alloc+ins+del+free = %f us\n", tm / (nins + ndel + 2.0 * NLOOPS));
+    return 0;
 }
-
+
 /*
  * Local variables:
  * mode: C
