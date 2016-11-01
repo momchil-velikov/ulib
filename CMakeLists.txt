@@ -9,7 +9,7 @@ add_library(ulib ulib/bitset.c ulib/cache.c ulib/hash.c ulib/log.c
             ulib/utf8.c ulib/vector.c)
 
 link_libraries(ulib)
-include_directories(${CMAKE_SOURCE_DIR})          
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})          
 
 add_executable(test-pgalloc test/test-pgalloc.c)
 add_executable(test-cache test/test-cache.c)
