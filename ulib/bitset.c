@@ -202,13 +202,9 @@ ulib_bitset_is_set(const ulib_bitset *set, unsigned int n) {
 
     if (idx >= set->used_len)
         return 0;
-    else {
-        const bitset_elt *elt;
 
-        elt = ulib_vector_elt(&set->bits, idx);
-
-        return *elt & ((bitset_elt)1 << bit_index(n));
-    }
+    const bitset_elt *elt = ulib_vector_elt(&set->bits, idx);
+    return (*elt & ((bitset_elt)1 << bit_index(n))) != 0;
 }
 
 /* Set theoretic union: DST = SRC1 | SRC2.  */
