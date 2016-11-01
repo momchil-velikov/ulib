@@ -120,7 +120,7 @@ ulib_bitset_set(ulib_bitset *set, unsigned int n) {
         memset(elt + set->used_len, 0, (idx - set->used_len + 1) * sizeof(bitset_elt));
         set->used_len = idx + 1;
     }
-    elt[idx] |= 1U << bit_index(n);
+    elt[idx] |= (bitset_elt)1 << bit_index(n);
 
     return 0;
 }
@@ -155,7 +155,7 @@ ulib_bitset_set_bits(ulib_bitset *set, unsigned int n, const unsigned int *idx) 
 
     /* Set bits.  */
     for (i = 0; i < n; ++i)
-        elt[elt_index(idx[i])] |= 1U << bit_index(idx[i]);
+        elt[elt_index(idx[i])] |= (bitset_elt)1 << bit_index(idx[i]);
 
     return 0;
 }
@@ -169,7 +169,7 @@ ulib_bitset_clear(ulib_bitset *set, unsigned int n) {
         bitset_elt *elt;
 
         elt = ulib_vector_front(&set->bits);
-        elt[idx] &= ~(1U << bit_index(n));
+        elt[idx] &= ~((bitset_elt)1 << bit_index(n));
 
         if (elt[idx] == 0 && idx == set->used_len - 1)
             set->used_len = used_len(set);
@@ -188,7 +188,7 @@ ulib_bitset_clear_bits(ulib_bitset *set, unsigned int n, const unsigned int *idx
     elt = ulib_vector_front(&set->bits);
     for (i = 0; i < n; ++i) {
         if (elt_index(idx[i]) < set->used_len)
-            elt[elt_index(idx[i])] &= ~(1U << bit_index(idx[i]));
+            elt[elt_index(idx[i])] &= ~((bitset_elt)1 << bit_index(idx[i]));
     }
 
     if (elt[set->used_len - 1] == 0)
@@ -207,7 +207,7 @@ ulib_bitset_is_set(const ulib_bitset *set, unsigned int n) {
 
         elt = ulib_vector_elt(&set->bits, idx);
 
-        return *elt & (1U << bit_index(n));
+        return *elt & ((bitset_elt)1 << bit_index(n));
     }
 }
 
